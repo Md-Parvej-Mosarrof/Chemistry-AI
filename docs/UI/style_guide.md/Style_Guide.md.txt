@@ -1,0 +1,83 @@
+﻿🎨 Core Color System
+
+  Primary Deep Navy       Science Teal         Atomic Cyan        Energy Amber
+     [ #0F1E36 ]          [ #008080 ]          [ #00E5FF ]         [ #FFB300 ]
+
+1. Primary Colors (Brand Identity & Structure)
+These colors form the skeletal structure of the app, establishing a trustworthy, academic, and highly professional scientific environment.
+• Primary Deep Navy (#0F1E36):
+  • Concept: Represents deep space, molecular structures, and ultimate authority.
+
+  • Usage: App headers, core navigation bars, primary text, and structural container boundaries.
+
+  • Psychology: Trustworthy, stable, and intellectual.
+
+• Neutral Slate (#2D3748):
+  • Concept: A balanced neutral gray.
+
+  • Usage: Primary body text, descriptions, and textbook passages. It is much softer on the eyes than pure #000000.
+
+2. Secondary Colors (Functional Division)
+These colors draw attention to active interactive elements, distinct chemistry modules (e.g., periodic table trends vs. equation solvers), and highlighted concepts.
+• Science Teal (#008080):
+  • Concept: The color of classical laboratory glass and chemical solutions.
+
+  • Usage: Primary buttons, active tab indicators, and featured cards.
+
+  • Psychology: Analytical, calm, and scientific.
+
+• Soft Ether Blue (#E6FFFA):
+  • Concept: A highly diluted, clean background tint.
+
+  • Usage: Light mode card backgrounds, subtle text highlights, and info-banners.
+
+3. Accent Colors (Focal Points)
+Spurring interest and spotlighting critical interactions or gamified milestones (like matching formulas or completing a chemistry deck).
+• Atomic Cyan (#00E5FF):
+  • Concept: High-energy chemical bonding and modern UI glow.
+
+  • Usage: Focus rings, progress meters, active molecular bond highlights, and interactive node selections.
+
+• Energy Amber (#FFB300):
+  • Concept: Representing electrons, heat, and reactions.
+
+  • Usage: Premium feature badges, daily streaks, achievements, and structural warnings.
+
+4. System Feedback & Chemistry Safety Colors
+An educational chemistry app requires a strict feedback system to guide students through right/wrong answers and alert them to toxic/safe compounds in laboratory modules.
+• Safe Green (#10B981): Correct answers in quizzes, neutral/safe pH levels, and stable elements.
+
+• Warning Orange (#F59E0B): Intermediate quiz hints, unstable isotopic states, and moderate hazard warnings.
+
+• Hazard Red (#EF4444): Incorrect answers, explosive/toxic compound warnings (GHS symbols), and critical UI errors.
+
+🌓 Dark Mode vs. Light Mode Adaptation
+To support student study patterns—which shift from bright classrooms during the day to late-night cramming in dorm rooms—the palette seamlessly flips background/foreground values while maintaining identical semantic meaning.
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                 THEME COMPARISON                            │
+├──────────────────────────────────────┬──────────────────────────────────────┤
+│              LIGHT MODE              │              DARK MODE               │
+├──────────────────────────────────────┼──────────────────────────────────────┤
+│  App BG: #F4F7F6 (Off-White/Teal)    │  App BG: #0A0F1D (Abyss Black)       │
+│  Surface BG: #FFFFFF (Pure White)    │  Surface BG: #121B2D (Deep Navy-Gray)│
+│  Primary Text: #0F1E36 (Deep Navy)   │  Primary Text: #F8FAFC (Bright Slate)│
+│  Border: #E2E8F0 (Soft Gray)         │  Border: #1E293B (Dark Blue-Gray)    │
+│  Secondary Teal: #008080             │  Secondary Teal: #4FD1C5 (Neon Teal) │
+└──────────────────────────────────────┴──────────────────────────────────────┘
+
+> 💡 Pro-Tip for Chemistry Diagrams: In Dark Mode, neon accents like Atomic Cyan (#00E5FF) are used to draw molecule skeletons on dark cards. This mimics a futuristic glowing glass board, maximizing engagement and clarity.
+♿ Accessibility & Contrast Compliance (WCAG 2.1)
+To ensure this educational system is accessible to all students, including those with visual impairments or color vision deficiencies (color-blindness), the color system employs strict accessibility rules:
+1. Strict Contrast Ratios (AA & AAA Standards):
+  • In Light Mode, any body text (#2D3748) on a white surface (#FFFFFF) easily exceeds the 4.5:1 WCAG AA requirement, reaching a highly readable contrast of over 10:1.
+
+  • In Dark Mode, neon interactive text/labels are boosted. For example, instead of dark Science Teal (#008080), interactive text switches to Neon Teal (#4FD1C5) on dark surfaces (#121B2D) to ensure it stays above 4.5:1.
+
+2. No "Color-Only" States (The Deuteranopia / Protanopia Shield):
+  • Rule: Never rely solely on red/green to indicate right/wrong quiz answers or hazards.
+
+  • Implementation: Combine colors with Icons and Micro-copy. A correct quiz choice displays the Safe Green (#10B981) color alongside a checkmark icon ($\checkmark$) and the word "Correct!". An error displays Hazard Red (#EF4444) with a cross icon ($\times$).
+
+3. Visual Weight Hierarchy:
+  • Text inputs always feature a clear focus ring in Atomic Cyan (#00E5FF) with a 2px width to make keyboard navigation obvious for users with limited mobility or vision.

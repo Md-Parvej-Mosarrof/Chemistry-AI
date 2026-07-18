@@ -1,0 +1,141 @@
+﻿## 🏠 1. Home Screen (Dashboard Hub)
+
+* **Layout Structure:** Vertical scrolling stack with a sticky top bar and fixed bottom navigation.
+* **Header Section:**
+* `[Top Bar]`: Left side shows user greeting `"Hello, Parvez!"` in bold text. Right side holds a circular `[Language Toggle]` pill switch (`EN | বাং`) and a `[Notification Bell]` icon.
+
+* **Hero Section (Quick Scanner):**
+* A large structural `[Box Container]` with dashed borders representing a premium feature card.
+* Inside: Centered `[Camera Icon]` with the text label `"Scan Handwritten Equation or Textbook Structure"`.
+* Underneath it, a prominent primary solid `[CTA Button]` labeled `"Open Camera Scanner"`.
+
+* **Quick Action Grid (2x2 Layout):**
+* `[Tile 1]`: `"3D Molecule Builder"` (Includes a placeholder element cube icon).
+* `[Tile 2]`: `"Reaction Predictor"` (Includes a chemical arrow icon).
+* `[Tile 3]`: `"Periodic Table"` (Includes a miniature grid icon).
+* `[Tile 4]`: `"AI Expert Chat"` (Includes a speech bubble icon).
+
+* **Recent Activity Carousel:**
+* Horizontal scrolling block showing $2.5$ preview cards of recently performed searches or builds (e.g., `"C₂H₅OH Properties"`, `"Methane Combustion"`).
+
+* **Persistent Bottom Navigation:**
+* A flat $64\text{ dp}$ strip containing 4 layout icons: `[Home (Active)]`, `[Search]`, `[Quiz]`, `[Profile]`.
+
+---
+
+## 🔍 2. Reaction Search Screen
+
+* **Layout Structure:** Search-focused page layout with an absolute focus on clean keyboard interactions.
+* **Header / Search Inputs:**
+* `[Back Arrow Icon]` aligned next to a standard width `[Search Bar Input Field]`.
+* Inside the Search Input: Left-side magnifying glass icon `[🔍]`, text string `"Enter reactants or search concepts..."`, and right-side voice input icon `[🎙️]`.
+
+* **Advanced Formula Input Tool (Contextual Keyboard Accessory):**
+* Directly above the device's keyboard interface, a fixed toolbar row provides quick-tap actions for chemistry formatting: `[Subscript Mode (X₂)]`, `[Superscript Mode (X²)]`, `[Reaction Arrow (─►)]`, `[Plus Sign (+)]`, and common shortcut element symbols `[ C ]`, `[ H ]`, `[ O ]`, `[ N ]`.
+
+* **Search History / Suggestions Category:**
+* A clean vertical list underneath the search input when empty.
+* Each row contains a left clock icon `[🕒]`, text string of a historical search, and a right delete icon `[✕]`.
+* *Example rows:* `"H₂SO₄ + NaOH"`, `"Oxidation state rules"`.
+
+---
+
+## 📄 3. Reaction Result Screen
+
+* **Layout Structure:** Highly organized, split-section data view focusing on technical formatting.
+* **Top Structural Box (The Equation Card):**
+* A large bordered card containing the balanced chemical equation highlighted in a distinct Monospace code block font.
+* *Visual text layout:* `CH₄  +  2 O₂   ───►   CO₂  +  2 H₂O`
+* Directly below the arrow, a small text badge centered reading `[ Catalyst: Heat / Δ ]`.
+
+* **Tabbed Analytical Navigation:**
+* A segment control row split evenly: `[ Mechanism ] (Active)` | `[ Thermodynamics ]` | `[ Safety / GHS ]`.
+
+* **Content View Panel (Dynamic Tab Switching):**
+* *Step-by-Step Mechanism Layout:* A vertical numbered timeline block (`1.`, `2.`, `3.`). Each step describes electronic transitions or bond-breaking details using structured, left-aligned body blocks.
+
+* **Bottom Action Bar:**
+* Two side-by-side secondary layout buttons: Left side `[⭐ Save to Notebook Button]`, Right side `[📤 Share/Export PDF Button]`.
+
+---
+
+## 💬 4. AI Chat Screen
+
+* **Layout Structure:** Classic messaging interface optimized for technical syntax rendering.
+* **Top Header:**
+* `[Back Arrow]` | `[AI Profile Placeholder Icon]` | Title text `"Chemistry AI Assistant"` (Subtitle: `"Online / Processing"`). Right-aligned `[Clear Chat Icon]`.
+
+* **Scrollable Chat Window:**
+* **User Bubble (Right Aligned):** Solid gray container block with white text copy.
+* **AI Response Bubble (Left Aligned):** Soft tint container box with dark text. Contains an internal layout breakdown:
+* *Top Section:* Structured text explaining a concept.
+* *Middle Embedded Widget:* A bounded mathematical card displaying chemical step steps using precise formatting.
+* *Bottom Section:* Quick-feedback binary buttons `[👍 Thumbs Up]` `[👎 Thumbs Down]`.
+
+* **Bottom Input Console:**
+* A continuous horizontal bar housing an attachment paperclip icon `[📎]` (for uploading images of problems), a large text input box, and a circular solid send button `[➔]`.
+
+---
+
+## 📝 5. Quiz Screen
+
+* **Layout Structure:** Gamified educational interface with strong status confirmation patterns.
+* **Top Progress Banner:**
+* Top row: Current score counter `[ Score: 80xp ]` and an absolute exit button `[✕ Close]`.
+* Middle row: A slender, filled tracking `[Progress Bar]` indicating `[ Question 4 of 10 ]`.
+
+* **Main Question Area:**
+* A main container card hosting the primary query: `"What is the formal oxidation state of sulfur in H₂SO₄?"` (Rendered in bold heading font size).
+
+* **Interactive Multiple Choice Stack (4 Options Stacked Vertically):**
+* `[Option Row A]`: Bordered empty rectangle outline containing text `"(A) +4"`.
+* `[Option Row B]`: Green-tinted rectangle with a checked circle icon containing text `"(B) +6  ✔ Correct"`.
+* `[Option Row C]`: Red-tinted rectangle with an X mark circle icon containing text `"(C) -2  ✕ Incorrect"`.
+* `[Option Row D]`: Bordered empty rectangle outline containing text `"(D) 0"`.
+
+* **Action Bottom State:**
+* A full-width primary action button spanning the bottom edge labeled `"Continue to Next Question"` (Initially disabled until an option choice is registered).
+
+---
+
+## 👤 6. Profile Screen
+
+* **Layout Structure:** High-end dashboard tracking personalized user data and milestones.
+* **Header Profile Card:**
+* Centrally aligned profile card containing a large circular `[User Avatar Avatar Block]`.
+* Directly underneath: User title string `"Md. Parvez Mosharraf"` in bold text.
+* Subtitle tracking line: `"Class: HSC 26 | Account Tier: Premium Scholar"`.
+
+* **Gamified Streaks & Metrics Grid (2 Column Layout):**
+* `[Left Statistic Container Box]`: Metric label `"12 Days"` above a small trophy icon representing `"Active Learning Daily Streak"`.
+* `[Right Statistic Container Box]`: Metric label `"142 solved"` above an atom icon representing `"Total Chemical Equations Processed"`.
+
+* **Sub-Section (Academic Folder Log):**
+* Section header text `"My Saved Formulations"`.
+* A list of vertical navigation text items with trailing arrow icons `[>]`:
+* `[📁 Organic Chemistry Solves]`
+* `[📁 Inorganic Reactions Log]`
+* `[📁 Saved 3D Molecular Models]`
+
+---
+
+## ⚙️ 7. Settings Screen
+
+* **Layout Structure:** Minimalist, highly organized, scrollable menu tracking core application parameters.
+* **Header:**
+* `[Back Arrow Icon]` aligned with central screen title text `"Settings"`.
+
+* **Preferences Category List (Grouped Rows):**
+* **Group 1: Interface Customization**
+* Row item: `"Dark Theme Active"` | Right-aligned `[Switch Component Toggle]`.
+* Row item: `"App Language Switching"` | Right-aligned text descriptor value `"English (US)"` with trailing arrow `[>]`.
+
+* **Group 2: Account & Storage**
+* Row item: `"Sync Lab Notebook Offline"` | Right-aligned `[Switch Component Toggle]`.
+* Row item: `"Clear Local App Cache Data"` | Text row highlighting total data weight (e.g., `"42.5 MB"`).
+
+* **Group 3: Academic / Syllabus Alignment**
+* Row item: `"Current Educational Syllabus"` | Selected state text label `"HSC (Bangladeshi National Curriculum)"`.
+
+* **Absolute Footer Row:**
+* A centered, text-only ghost action button colored in hazard red formatting reading `"Log Out Account"`, followed by a tiny version string caption reading `"v2.4.0 (AI Core Beta)"`.

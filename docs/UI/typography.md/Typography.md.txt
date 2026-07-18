@@ -1,0 +1,66 @@
+﻿✒️ Bilingual Typefaces
+To maintain a unified, highly legible, and premium aesthetic across both English and Bangla text, we use a dual-font stack designed for digital screens.
+Bangla Font
+• Primary Typeface: Hind Siliguri or SolaimanLipi
+  • Usage: All standard Bangla headings, body text, UI labels, and buttons.
+
+  • Why: Highly readable on mobile screens at small sizes; handles complex Bangla conjuncts (যুক্তাক্ষর) cleanly without overlapping line-heights.
+
+English Font
+• Primary Typeface: Inter
+  • Usage: All English text, user interface elements, labels, and UI controls.
+
+  • Why: An industry-standard sans-serif with a neutral, clean look and an exceptionally high x-height, which ensures legibility on low-resolution displays.
+
+• Technical & Formula Typeface (Monospace): JetBrains Mono or Fira Code
+  • Usage: Chemical formulas ($C_6H_{12}O_6$), SMILES strings, equations, and step-by-step algorithms.
+
+  • Why: Equal-width characters prevent numbers and symbols from crowding, making subscripts ($2$, $3$, $x$) instantly distinguishable.
+
+📏 Typography Scale & Hierarchy
+We use a standard mobile typographic scale to ensure an orderly, scannable hierarchy.
+
+🎛️ Component-Specific Styling
+1. Buttons
+Buttons drive critical user actions and require maximum legibility.
+• Font Family: Inter (English) / Hind Siliguri (Bangla)
+
+• Font Size / Line Height: 14sp / 20dp
+
+• Font Weight: Semi-Bold (600) or Medium (500)
+
+• Letter Spacing: 0.5px (English only, uppercase is optional; keep sentence case for Bangla)
+
+• Case: Sentence Case (e.g., "Solve reaction" or "বিক্রিয়া সমাধান করো")
+
+2. Cards
+Cards summarize complex learning structures or display chemical compounds.
+• Card Title: Section Heading (18sp, Semi-Bold, Primary Deep Navy)
+
+• Card Body Text: Body Text (Primary) (14sp, Regular, Neutral Slate)
+
+• Meta / Micro-data: Caption (10sp, Regular, Secondary Gray)
+
+• Layout Rule: Ensure a minimum vertical line-spacing (line-height) of 22dp when mixing Bangla and English inside a single card to prevent complex characters from touching.
+
+3. Input Fields
+Inputs are critical for typing chemical structures or searching.
+• Input Label: Subtitle / Label (15sp, Medium, Slate)
+
+• Placeholder Text: Body Text (Primary) (14sp, Regular, Light Gray)
+
+• Active User Input: Technical Body (13sp, Regular, JetBrains Mono) — this ensures that chemical symbols entered by the user are highly legible.
+
+♿ Typography Accessibility Guidelines
+To ensure the educational app remains fully accessible under WCAG 2.1 AA/AAA rules:
+1. Scale in SP (Scalable Pixels):
+  • Always define font sizes in sp (never dp or px). This ensures that if a student increases their device's default system font size for accessibility, the app's typography scales proportionally.
+
+2. Minimum Legible Contrast:
+  • Primary Body text on light backgrounds must have a contrast ratio of at least 4.5:1 (e.g., using Deep Navy #0F1E36 over White #FFFFFF yields a ratio of over 10:1).
+
+3. Strict Line Height Limits for Bangla:
+  • Bangla script has ascenders and descenders (মাত্রার ওপরের ও নিচের অংশ). To prevent these from overlapping or clipping, never set a line-height multiplier below 1.5 for Bangla body copy.
+
+4. Avoid Pure Center-Alignment for Long Paragraphs:
+  • Always left-align blocks of educational text longer than 3 lines. Left-aligned text provides an anchor point for the eye, reducing reading fatigue for students with dyslexia or cognitive impairments.

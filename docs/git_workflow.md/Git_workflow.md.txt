@@ -1,0 +1,107 @@
+﻿🌳 Branch Topology
+Plaintext
+
+  main     [Production]  ───────────────────────────────● (v1.0.0) ───────
+                          ▲                           │
+  release  [Pre-Prod]     │                           ▼ (Hotfix push)
+                          ├─────────────────● ────────┴───────────────────
+                          ▲                ╱
+  develop  [Staging]     ─●───────────────●───────────────────────────────
+                          ▲             ▲
+  feature  [Dev]          └──●───●────┘ │
+                                        └──●───● (Bugfix branch)
+
+1. The Long-Lived Protected Branches
+• main: Production environment. Contains the stable, shipped source code. Directly pushed commits are forbidden here. Code only arrives via approved release/* or bugfix/* branch mergers. Every merge to main must be tagged with a version number (e.g., v1.0.0).
+
+• develop: Staging environment / Integration branch. This is where all complete features converge for internal integration testing. Nightly or staging builds are triggered directly from this branch.
+
+2. The Short-Lived Supporting Branches
+• feature/*: Used for building new user stories or system enhancements.
+  • Naming convention: feature/JIRA-123-user-authentication
+
+  • Lifecycle: Branches off develop ➔ Merges back into develop via Pull Request.
+
+• bugfix/*: Used to resolve routine defects found during staging, QA, or development.
+  • Naming convention: bugfix/JIRA-456-fix-quiz-timer
+
+  • Lifecycle: Branches off develop ➔ Merges back into develop.
+
+  • Note (Hotfixes): If a critical bug breaks Production (main), branch off main as hotfix/*, patch it, and merge simultaneously back into both main and develop.
+
+• release/*: Used to bundle completed features from develop into a deployment package. No new features are added here—only last-minute bug fixes, translation tweaks, or documentation updates.
+  • Naming convention: release/v1.1.0
+
+  • Lifecycle: Branches off develop ➔ Merges into main (production deployment) AND back into develop (to port any release-specific bug fixes back to tracking).
+
+📝 Commit Standard: Conventional Commits
+Commits should be microscopic, self-contained, and descriptive. A developer looking at your logs should understand what changed and why without opening the code.
+Teams should enforce the Conventional Commits specification:
+Structural Format
+Plaintext
+
+<type>(<scope>): <short imperative description>
+
+[Optional longer body describing the 'why']
+[Optional footer referencing issue trackers like JIRA]
+
+Common Types (<type>)
+• feat: A new feature for the user (translates to a minor version bump).
+
+• fix: A bug fix for the user (translates to a patch version bump).
+
+• docs: Documentation-only changes.
+
+• style: Formatting, missing semi-colons, linting fixes (no code logic changes).
+
+• refactor: A code change that neither fixes a bug nor adds a feature.
+
+• test: Adding missing tests or correcting existing tests.
+
+Commit Examples
+> Good (Feature):feat(auth): add JWT generation to login routeGood (Bug Fix):fix(quiz): resolve null-pointer exception when timer hits zeroBad:fixed the bug or stuff added
+🔀 Pull Requests (PRs) & Code Review
+A Pull Request is not just a mechanism to merge code; it is a safety gate and a knowledge-sharing forum for the entire engineering team.
+1. Pull Request Guidelines
+Before hitting submit on a PR, the author must ensure:
+• The PR targets the correct branch (feature/* goes to develop; release/* goes to main).
+
+• The scope is tightly focused. A PR containing more than 400 lines of changes is incredibly difficult to review effectively. Break large features down.
+
+• The title clearly notes the scope (e.g., [JIRA-123] Implement AI Chat Endpoint).
+
+2. Mandatory PR Template
+Enforce a root-level markdown file (.github/pull_request_template.md) to establish a clear template structure:
+Markdown
+
+## Description
+Provide a concise summary of the changes and the architectural reasoning.
+
+## Related Issues
+Closes #JIRA-123
+
+## Type of Change
+- [ ] Bug fix (non-breaking change fixing an issue)
+- [ ] New feature (non-breaking change adding functionality)
+- [ ] Breaking change (fix or feature requiring migration)
+
+## Verification Checklist
+- [ ] Local unit tests pass successfully (`pytest` / `flutter test`).
+- [ ] Code follows project linting and structural styling rules.
+- [ ] API endpoints verified using a local client/Postman.
+
+3. Merging Requirements (Branch Protection Rules)
+Configure your Git provider (GitHub/GitLab) to strictly bar merges until these criteria are met:
+1. Peer Approvals: Requires at least 2 approvals from designated code owners.
+
+2. Green CI/CD Pipeline: Automated checks must pass successfully:
+  • Code compilation/build checks.
+
+  • Linter execution (zero warnings).
+
+  • Test suites execution (100% pass rate).
+
+3. Merge Strategy:
+  • Use Squash and Merge when merging feature/* into develop. This condenses dozens of tiny work-in-progress commits into one clean, definitive feature commit, keeping the tracking branches clean.
+
+  • Use Create a Merge Commit when merging release/* into main to preserve distinct release branch history.

@@ -1,0 +1,144 @@
+# Chemistry Learning App — Navigation System
+**Senior UX Design Spec** · Users: SSC, HSC, Honours 1st Year · Languages: Bangla, English
+
+---
+
+## 1. Design principles behind every decision
+
+Before the screen-by-screen breakdown, four constraints shaped the whole system:
+
+1. **Three very different student levels share one app.** SSC, HSC, and Honours students study different syllabi. The app can't just be "one big content tree" — level has to work like a *global filter*, always visible and always changeable, not a one-time onboarding choice buried in Settings.
+2. **Bangla/English isn't a nice-to-have.** Many students think in Bangla but study English-medium textbooks (or vice versa). Language needs a fast, shallow path to change — not three taps into Settings.
+3. **AI Tutor is the differentiator.** In a market of static "notes apps," conversational help is the reason to choose this app over a PDF. It deserves prime real estate in the bottom nav, not a buried menu item.
+4. **Fifteen screens is too many for one flat tab bar.** Following Hick's Law (more choices = slower decisions) and standard mobile conventions (4–5 items max in a bottom bar), most of the 15 screens have to be organized as *pushes* and *nested stacks*, not top-level tabs.
+
+---
+
+## 2. Full sitemap
+
+```
+Splash
+ └─▶ Onboarding (first launch only)
+      └─▶ Login
+           └─▶ [Bottom Navigation — authenticated root]
+                ├─ Home
+                │   ├─▶ Chapter List ──▶ Reaction Details
+                │   ├─▶ Reaction Details (from "continue learning" card)
+                │   └─▶ History ("recent activity" → see all)
+                ├─ Reaction Search
+                │   └─▶ Reaction Details
+                ├─ AI Tutor
+                │   └─▶ (contextual entry from Reaction Details: "Ask AI about this")
+                ├─ Quiz
+                │   ├─▶ Chapter List (topic picker)
+                │   └─▶ Quiz Session → Result
+                └─ Profile
+                    ├─▶ Bookmarks ──▶ Reaction Details
+                    ├─▶ History
+                    └─▶ Settings
+                         ├─▶ Language
+                         └─▶ About
+
+Reaction Details (reachable from Search, Chapter List, Home, Bookmarks)
+ ├─▶ Quiz (contextual: "practice this reaction")
+ └─▶ AI Tutor (contextual: "ask AI about this")
+```
+
+---
+
+## 3. Screen-by-screen navigation decisions
+
+### Splash
+**Role:** invisible traffic controller, not a destination.
+**Decision:** Splash runs three checks in the background — is this the first launch, is there a valid session token, is there a cached language/level preference — and routes accordingly:
+- First launch → **Onboarding**
+- Returning, not logged in → **Login**
+- Returning, logged in → **Home**
+
+**Why:** Nothing kills trust in an education app faster than making a returning HSC student re-pick their level and sit through slides every time. Splash's whole job is to make the *first* launch feel guided and every launch after that feel instant.
+
+### Onboarding
+**Role:** one-time setup, not marketing.
+**Decision:** 3-step flow — (1) two value-prop slides max, (2) **choose level** (SSC / HSC / Honours 1st Year), (3) **choose language** (Bangla / English). Skippable after step 2 (level is close to mandatory since content is organized around it; language defaults to device locale if skipped).
+
+**Why:** Level and language aren't preferences buried in Settings — they're *content filters* that determine what the student sees on literally every other screen. Capturing them at onboarding means Home is personalized from the very first real screen, instead of showing a generic "pick your syllabus" empty state.
+
+### Login
+**Decision:** Phone number, Google, or **Continue as Guest**. Guest mode allows browsing Chapter List, Reaction Search, and Reaction Details, but gates Quiz history, Bookmarks, and AI Tutor behind a lightweight "sign in to save progress" prompt.
+
+**Why:** Students often want to check a reaction quickly before committing to an account. A hard login wall in front of a study tool causes drop-off; a soft gate (browse free, save progress requires an account) respects that while still driving signups where it matters — progress tracking.
+
+### Bottom Navigation (Home · Search · AI Tutor · Quiz · Profile)
+**Decision:** Five tabs, no more. Chapter List, Bookmarks, History, Settings, Language, and About are deliberately **excluded** from the tab bar.
+
+**Why each of the five made it in:**
+- **Home** — the personalized landing point; has to be a tab because it's the "return to base" destination from anywhere.
+- **Reaction Search** — the single highest-frequency action in a chemistry app ("what's the mechanism for X") deserves one tap, not a drill-down.
+- **AI Tutor** — placed centrally, visually distinct (see diagram above) because it's the product's differentiator and needs to be *discoverable*, not something students stumble on inside a chapter.
+- **Quiz** — self-testing is a distinct *mode* of using the app (versus browsing/reading), so it earns its own tab rather than living inside Chapter List.
+- **Profile** — acts as the umbrella for everything identity- and account-related (see below), so students always know where to find "my stuff."
+
+**Why the others were excluded:** Chapter List, Bookmarks, and History are all *views into content the student already has some relationship with* — they're one tap deeper than a tab, reachable from Home or Profile, and don't need constant top-level visibility. Settings/Language/About are low-frequency, configuration-only screens; putting them in the tab bar would waste one of only five precious slots on something touched once a month.
+
+### Chapter List
+**Decision:** Not a tab — a **pushed screen**, reachable from Home ("browse all chapters") and from Quiz ("pick a topic to practice"). Organized by the student's current level (SSC/HSC/Honours), grouped by subject unit.
+
+**Why:** Chapter List is fundamentally a drill-down, not a hub — its job is to get a student *to* a chapter, not to be lingered on. Making it a shared, reusable screen (rather than duplicating "browse chapters" logic inside both Home and Quiz) keeps the content architecture single-sourced: one chapter list, multiple entry points.
+
+### Reaction Details
+**Decision:** A pushed screen reachable from four places — Reaction Search, Chapter List, Home's "continue learning" card, and Bookmarks. Contains contextual shortcuts to **Quiz** ("practice this reaction") and **AI Tutor** ("ask AI about this"), pre-filling the tutor's opening question.
+
+**Why:** This is the app's core content unit, so it needs multiple doors in — a student might arrive by searching, by browsing a chapter, or by resuming where they left off. The contextual AI/Quiz shortcuts matter more than they look: they turn AI Tutor and Quiz from "another tab to remember" into "the natural next step," which is what actually drives usage of the differentiator feature.
+
+### AI Tutor
+**Decision:** Tab-level access for a blank chat session, *plus* a contextual entry point from Reaction Details that opens the same tab pre-loaded with a question about that specific reaction.
+
+**Why:** Two very different use cases exist — "I have a general question" (tab) and "I'm stuck on this specific mechanism right now" (contextual). Routing both into the same underlying screen (rather than a separate "quick-ask" modal) keeps conversation history unified in one place, which also simplifies where past AI chats live (inside History, see below).
+
+### Quiz
+**Decision:** Tab opens to a topic picker (which pushes Chapter List if the student hasn't chosen a topic) → Quiz Session → Result screen. Also reachable contextually from Reaction Details for a single-reaction practice set.
+
+**Why:** Quiz needed a decision about *where topic selection lives*. Rather than duplicating a topic picker inside the Quiz tab, it reuses Chapter List — same reasoning as above: one source of truth for "what chapters exist," multiple modes (read vs. practice) layered on top.
+
+### Bookmarks
+**Decision:** Not a tab. Reachable from Profile (primary path) and from a bookmark icon in Home's header (quick-access shortcut) for students who bookmark heavily.
+
+**Why:** Bookmarking is a *personal library* feature — high value, but not high enough frequency to earn a tab slot next to Search or Quiz. Giving it two entry points (Profile, for "my account" mental model; Home header icon, for in-the-moment convenience) covers both without spending a tab.
+
+### History
+**Decision:** Not a tab. Reachable from Profile and from Home's "recent activity" section. Internally organized as three segments: Reactions viewed, Quiz attempts, AI Tutor conversations.
+
+**Why:** Consolidating three different activity streams into one screen (rather than three separate history screens) avoids fragmenting a low-frequency but reassuring feature ("what did I study last week?") across multiple navigation paths.
+
+### Profile
+**Decision:** Tab. Acts as the umbrella for Bookmarks, History, Settings, and account info/stats — all one push away from Profile.
+
+**Why:** This is the classic "everything about me" pattern users already know from every other app (Jakob's Law) — it reduces the cognitive cost of finding low-frequency screens because students already expect account-adjacent things to live behind a profile icon.
+
+### Settings
+**Decision:** Pushed from Profile, not a tab. Contains: Language, Notifications, Account, **change level** (SSC/HSC/Honours), Theme, About.
+
+**Why:** Settings is the correct home for *configuration*, but note that **Language also gets a fast-path outside Settings** (see below) — Settings is the thorough path, not the only path.
+
+### Language
+**Decision:** Two entry points — the thorough path (Settings → Language) and a **quick-toggle icon in Home's header** for switching Bangla/English in one tap.
+
+**Why:** This is the single most important shortcut in the whole system. If switching language required three taps through Settings every time, bilingual students (very common in this context) would find it easier to just struggle through the "wrong" language than navigate there. A one-tap header toggle acknowledges that language-switching is a *frequent, in-the-moment* action for this audience, not a set-once configuration.
+
+### About
+**Decision:** Pushed from Settings only — the deepest screen in the whole app, and deliberately so (app version, terms, contact info).
+
+**Why:** Truly static, touched-once content belongs at the end of the stack. Giving it any shortcut would just add noise to higher-traffic paths.
+
+---
+
+## 4. Why this isn't "one tab per screen"
+
+A common mistake with a 15-screen list is to try to flatten all of it into navigation — either a giant tab bar or a hamburger menu with 15 items. Both fail for different reasons:
+- A 15-item flat menu forces the student to *search* for things every time (violates recognition-over-recall).
+- This design instead uses **three navigation patterns layered together**:
+  1. **Bottom tabs** (5) for things touched every session.
+  2. **Push/stack navigation** (Chapter List, Reaction Details, Bookmarks, History, Settings, Language, About) for things reached through a hub.
+  3. **Contextual shortcuts** (AI Tutor and Quiz launched directly from Reaction Details) for the moments where the *content itself* should suggest the next action, rather than making the student back out to a tab.
+
+This keeps the bottom nav honest — only things a student does dozens of times a week — while every low-frequency screen is still reachable in one or two taps from a predictable hub (Home or Profile).

@@ -1,0 +1,673 @@
+# Building a Production FastAPI Backend Architecture
+
+I'll walk through this the same way — folder structure first, then every file explained, then how they connect at runtime.
+
+## 1. Project Setup
+
+```bash
+mkdir chemistry_app_backend && cd chemistry_app_backend
+python -m venv venv
+source venv/bin/activate
+```
+
+### Dependencies (`requirements.txt`)
+
+```txt
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+alembic==1.13.2
+pydantic==2.8.2
+pydantic-settings==2.3.4
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+redis==5.0.7
+python-multipart==0.0.9
+```
+
+**Why these:**
+- **SQLAlchemy 2.0 async + asyncpg**: native async ORM, avoids blocking the event loop under load.
+- **Alembic**: schema migrations — never hand-edit production tables.
+- **python-jose**: JWT encode/decode.
+- **passlib[bcrypt]**: password hashing — never store or compare raw passwords.
+- **redis**: caching, rate limiting, token blacklisting.
+
+## 2. Why This Architecture
+
+Same reasoning as the Flutter side: separate **what the business does** (services, domain logic) from **how it's exposed** (routers) and **how it's stored** (models, repositories). This lets you swap Postgres for another DB, or REST for GraphQL, without rewriting business rules — and makes every layer independently testable.
+
+## 3. Folder Structure
+
+```
+chemistry_app_backend/
+├── app/
+│   ├── main.py
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   ├── logging.py
+│   │   └── exceptions.py
+│   ├── db/
+│   │   ├── session.py
+│   │   ├── base.py
+│   │   └── redis.py
+│   ├── models/
+│   │   ├── user.py
+│   │   └── refresh_token.py
+│   ├── schemas/
+│   │   ├── user.py
+│   │   └── token.py
+│   ├── repositories/
+│   │   └── user_repository.py
+│   ├── services/
+│   │   ├── auth_service.py
+│   │   └── user_service.py
+│   ├── api/
+│   │   ├── deps.py
+│   │   └── v1/
+│   │       ├── router.py
+│   │       ├── auth.py
+│   │       └── users.py
+│   ├── middleware/
+│   │   └── rate_limit.py
+│   └── tests/
+│       ├── test_auth.py
+│       └── test_users.py
+├── alembic/
+│   ├── env.py
+│   └── versions/
+├── alembic.ini
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── .env
+```
+
+**Layer roles:**
+- `core/` — infrastructure that every request touches: settings, JWT logic, logging, global error handling.
+- `db/` — how we connect to Postgres and Redis.
+- `models/` — SQLAlchemy ORM tables (the DB shape).
+- `schemas/` — Pydantic models (the API's request/response shape) — deliberately separate from `models/` so you never leak internal DB fields (like `hashed_password`) to clients.
+- `repositories/` — raw DB queries. Nothing else touches the DB session directly.
+- `services/` — business logic (e.g., "register a user" = hash password + check duplicate email + create row + send welcome email).
+- `api/` — HTTP layer: routers translate requests into service calls.
+
+## 4. Configuration — `app/core/config.py`
+
+```python
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    PROJECT_NAME: str = "ChemLearn API"
+    API_V1_PREFIX: str = "/api/v1"
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str = "db"
+    POSTGRES_PORT: int = 5432
+
+    REDIS_HOST: str = "redis"
+    REDIS_PORT: int = 6379
+
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return (
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
+
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+
+settings = Settings()
+```
+
+**Why this matters:** every secret (`JWT_SECRET_KEY`, DB password) comes from environment variables, never hardcoded. `pydantic-settings` validates on startup — the app fails fast if a required env var is missing, instead of failing mysteriously mid-request.
+
+```bash
+# .env.example
+POSTGRES_USER=chemapp
+POSTGRES_PASSWORD=change_me
+POSTGRES_DB=chemapp_db
+JWT_SECRET_KEY=generate_a_long_random_string_here
+```
+
+Never commit `.env` — only `.env.example` as a template. Add `.env` to `.gitignore`.
+
+## 5. Security Core — `app/core/security.py`
+
+```python
+from datetime import datetime, timedelta, timezone
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+from app.core.config import settings
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_access_token(subject: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": subject, "exp": expire, "type": "access"}
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+def create_refresh_token(subject: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    payload = {"sub": subject, "exp": expire, "type": "refresh"}
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+def decode_token(token: str) -> dict:
+    try:
+        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+    except JWTError:
+        raise ValueError("Invalid or expired token")
+```
+
+**Key security decisions:**
+- Passwords are **bcrypt-hashed**, never stored or logged in plaintext.
+- **Short-lived access tokens (15 min)** + **longer refresh tokens (7 days)** — limits the damage window if an access token leaks, since it expires fast, while refresh tokens let users stay logged in without re-entering credentials constantly.
+- Refresh tokens are tracked in the DB (see `models/refresh_token.py` below) so they can be **revoked** on logout — a bare JWT can't be invalidated early otherwise.
+- Token `type` field prevents someone using a refresh token where an access token is expected.
+
+## 6. Database Session — `app/db/session.py`
+
+```python
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from app.core.config import settings
+
+engine = create_async_engine(settings.DATABASE_URL, pool_pre_ping=True, echo=False)
+
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)
+
+async def get_db() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session
+```
+
+`pool_pre_ping=True` checks connections are alive before use — prevents "stale connection" errors after Postgres restarts or idle timeouts. `get_db` is a FastAPI dependency — each request gets its own session, closed automatically afterward.
+
+```python
+# app/db/base.py
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
+```
+
+Every model inherits from this — Alembic uses it to autogenerate migrations by diffing your models against the live schema.
+
+```python
+# app/db/redis.py
+import redis.asyncio as redis
+from app.core.config import settings
+
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
+)
+```
+
+Single shared async Redis client, reused for caching and rate-limit counters.
+
+## 7. Models — `app/models/user.py`
+
+```python
+from sqlalchemy import String, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.base import Base
+import uuid
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+```
+
+UUID primary keys instead of auto-increment integers — prevents user enumeration attacks (guessing `/users/1`, `/users/2`...).
+
+```python
+# app/models/refresh_token.py
+from sqlalchemy import String, ForeignKey, DateTime, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
+from app.db.base import Base
+import uuid, datetime
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    expires_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+```
+
+Storing refresh tokens lets you revoke a specific session (e.g., "log out this device") or all sessions on password change — a stateless JWT alone can't support that.
+
+## 8. Schemas — `app/schemas/user.py`
+
+```python
+from pydantic import BaseModel, EmailStr, Field
+import uuid
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=72)
+    full_name: str | None = None
+
+class UserRead(BaseModel):
+    id: uuid.UUID
+    email: EmailStr
+    full_name: str | None
+    is_active: bool
+    is_verified: bool
+
+    model_config = {"from_attributes": True}
+```
+
+`UserRead` deliberately excludes `hashed_password` — this is the contract that guarantees the API response never leaks it, even if a developer accidentally passes the whole ORM object. `password: Field(min_length=8, max_length=72)` — 72 is bcrypt's max input length; enforcing it here prevents silent truncation bugs.
+
+```python
+# app/schemas/token.py
+from pydantic import BaseModel
+
+class TokenPair(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+```
+
+## 9. Repository Layer — `app/repositories/user_repository.py`
+
+```python
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.models.user import User
+import uuid
+
+class UserRepository:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def get_by_email(self, email: str) -> User | None:
+        result = await self.db.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
+
+    async def get_by_id(self, user_id: uuid.UUID) -> User | None:
+        result = await self.db.execute(select(User).where(User.id == user_id))
+        return result.scalar_one_or_none()
+
+    async def create(self, email: str, hashed_password: str, full_name: str | None) -> User:
+        user = User(email=email, hashed_password=hashed_password, full_name=full_name)
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+```
+
+Only this class writes raw SQL/ORM queries for users. Services never touch `db.execute` directly — this keeps query logic in one place and makes it trivial to mock in tests.
+
+## 10. Service Layer — `app/services/auth_service.py`
+
+```python
+from app.repositories.user_repository import UserRepository
+from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token
+from app.core.exceptions import AuthError
+from app.models.refresh_token import RefreshToken
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timedelta, timezone
+from app.core.config import settings
+
+class AuthService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.user_repo = UserRepository(db)
+
+    async def register(self, email: str, password: str, full_name: str | None):
+        existing = await self.user_repo.get_by_email(email)
+        if existing:
+            raise AuthError("Email already registered")
+        hashed = hash_password(password)
+        return await self.user_repo.create(email, hashed, full_name)
+
+    async def login(self, email: str, password: str):
+        user = await self.user_repo.get_by_email(email)
+        if not user or not verify_password(password, user.hashed_password):
+            raise AuthError("Invalid credentials")
+        if not user.is_active:
+            raise AuthError("Account disabled")
+
+        access_token = create_access_token(str(user.id))
+        refresh_token = create_refresh_token(str(user.id))
+
+        expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        self.db.add(RefreshToken(user_id=user.id, token=refresh_token, expires_at=expires_at))
+        await self.db.commit()
+
+        return access_token, refresh_token
+```
+
+Notice `login` returns a **generic "Invalid credentials"** error whether the email doesn't exist or the password is wrong — never reveal which one failed, or you hand attackers a free email-enumeration oracle.
+
+## 11. API Dependencies — `app/api/deps.py`
+
+```python
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.db.session import get_db
+from app.core.security import decode_token
+from app.repositories.user_repository import UserRepository
+from app.models.user import User
+import uuid
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    credentials_error = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = decode_token(token)
+        if payload.get("type") != "access":
+            raise credentials_error
+        user_id = uuid.UUID(payload.get("sub"))
+    except (ValueError, TypeError):
+        raise credentials_error
+
+    user = await UserRepository(db).get_by_id(user_id)
+    if user is None or not user.is_active:
+        raise credentials_error
+    return user
+```
+
+This dependency is injected into every protected route (`Depends(get_current_user)`). FastAPI runs it automatically before the route body, rejecting invalid/expired/wrong-type tokens with a proper 401 before any business logic executes.
+
+## 12. Routers — `app/api/v1/auth.py`
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.db.session import get_db
+from app.schemas.user import UserCreate, UserRead
+from app.schemas.token import TokenPair, RefreshRequest
+from app.services.auth_service import AuthService
+from app.core.exceptions import AuthError
+
+router = APIRouter(prefix="/auth", tags=["auth"])
+
+@router.post("/register", response_model=UserRead, status_code=201)
+async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
+    try:
+        user = await AuthService(db).register(payload.email, payload.password, payload.full_name)
+    except AuthError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return user
+
+@router.post("/login", response_model=TokenPair)
+async def login(payload: UserCreate, db: AsyncSession = Depends(get_db)):
+    try:
+        access, refresh = await AuthService(db).login(payload.email, payload.password)
+    except AuthError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    return TokenPair(access_token=access, refresh_token=refresh)
+```
+
+Routers stay thin: parse request → call service → map errors to HTTP status codes. No business logic lives here — that's testable in isolation inside `AuthService`.
+
+```python
+# app/api/v1/users.py
+from fastapi import APIRouter, Depends
+from app.schemas.user import UserRead
+from app.api.deps import get_current_user
+from app.models.user import User
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.get("/me", response_model=UserRead)
+async def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
+```
+
+```python
+# app/api/v1/router.py
+from fastapi import APIRouter
+from app.api.v1 import auth, users
+
+api_router = APIRouter()
+api_router.include_router(auth.router)
+api_router.include_router(users.router)
+```
+
+Single aggregation point — `main.py` only needs to know about `api_router`, not every individual router file. Adding a new resource (e.g., `quizzes.py`) means one new file + one line here.
+
+## 13. Rate Limiting Middleware — `app/middleware/rate_limit.py`
+
+```python
+from fastapi import Request, HTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
+from app.db.redis import redis_client
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path in ("/api/v1/auth/login", "/api/v1/auth/register"):
+            ip = request.client.host
+            key = f"rate_limit:{request.url.path}:{ip}"
+            count = await redis_client.incr(key)
+            if count == 1:
+                await redis_client.expire(key, 60)
+            if count > 5:
+                raise HTTPException(status_code=429, detail="Too many requests, slow down")
+        return await call_next(request)
+```
+
+Login/register are brute-force targets — this caps attempts to 5/minute/IP using Redis as a fast, shared counter across all app instances (critical once you run more than one container).
+
+## 14. Global Exceptions & Logging
+
+```python
+# app/core/exceptions.py
+class AuthError(Exception):
+    pass
+```
+
+```python
+# app/core/logging.py
+import logging
+
+def setup_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    )
+```
+
+Structured, centralized logging setup — call once at startup so every module's `logging.getLogger(__name__)` behaves consistently. Never log passwords, tokens, or full request bodies.
+
+## 15. Application Entrypoint — `app/main.py`
+
+```python
+from fastapi import FastAPI
+from app.core.config import settings
+from app.core.logging import setup_logging
+from app.api.v1.router import api_router
+from app.middleware.rate_limit import RateLimitMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
+setup_logging()
+
+app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yourfrontend.com"],  # never "*" with credentials
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+app.add_middleware(RateLimitMiddleware)
+
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+```
+
+**Security note on CORS:** `allow_origins` is your actual frontend domain, never `"*"` when `allow_credentials=True` — that combination lets any website read authenticated responses from your API in a victim's browser.
+
+## 16. Alembic Migrations
+
+```bash
+alembic init alembic
+```
+
+```python
+# alembic/env.py (key section to edit)
+from app.db.base import Base
+from app.models import user, refresh_token  # import so metadata is registered
+target_metadata = Base.metadata
+```
+
+```bash
+alembic revision --autogenerate -m "create users and refresh_tokens tables"
+alembic upgrade head
+```
+
+Migrations are version-controlled SQL diffs — this is how schema changes move safely from your laptop to staging to production without manual `ALTER TABLE` commands.
+
+## 17. Docker
+
+```dockerfile
+# Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./app ./app
+COPY ./alembic ./alembic
+COPY alembic.ini .
+
+RUN useradd -m appuser
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+**Security notes:**
+- `python:3.12-slim` — smaller attack surface than full image.
+- Runs as non-root `appuser` — if the container is compromised, the attacker doesn't get root inside it.
+- Only copies what's needed — no `.env`, no `.git`, no tests (use a `.dockerignore`).
+
+```dockerfile
+# .dockerignore
+.env
+.git
+__pycache__
+*.pyc
+venv/
+app/tests/
+```
+
+```yaml
+# docker-compose.yml
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+```
+
+`depends_on` with `condition: service_healthy` ensures the API container waits for Postgres to actually accept connections, not just for the container process to start — a common source of flaky startup failures.
+
+Run everything:
+```bash
+docker compose up --build
+```
+
+## 18. Security Checklist Recap
+
+| Concern | How it's handled |
+|---|---|
+| Password storage | bcrypt hash, never plaintext |
+| Token compromise | short-lived access token (15 min) |
+| Session revocation | refresh tokens stored in DB, revocable |
+| Brute force | Redis-backed rate limiting on auth routes |
+| User enumeration | UUID IDs, generic login error messages |
+| Secrets | all via env vars, never committed |
+| CORS | explicit origin allowlist, no wildcard + credentials |
+| Container hardening | non-root user, minimal base image |
+| SQL injection | SQLAlchemy parameterized queries only, no raw string SQL |
+| DB schema drift | Alembic migrations, never manual edits |
+
+## 19. Suggested Build Order
+
+1. Get `docker compose up` running with just `db` + `redis` + a health-check endpoint — confirm infra works before writing business logic.
+2. Build the `auth` feature vertically (model → repository → service → router) — validates the whole architecture end to end.
+3. Add Alembic migration for the initial schema.
+4. Add rate limiting once login/register work.
+5. Layer in feature-specific resources (e.g., `lessons`, `quiz_results`) following the same repository/service/router pattern.
+6. Add tests: mock `UserRepository` for service tests, use `httpx.AsyncClient` + a test database for router integration tests.
+
+A natural next step is wiring this backend to your Flutter app's `dio` client with automatic refresh-token retry on 401 — want me to build that interceptor next, or flesh out a `quiz_results` resource on the backend first?

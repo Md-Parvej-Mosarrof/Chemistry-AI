@@ -1,0 +1,94 @@
+﻿1. Naming Conventions
+Consistency in naming allows developers to switch between Flutter, Python, and SQL without guessing casing rules.
+Layer / Technology	Element	Case Convention	Example
+Flutter (Dart)	Classes, Mixins, Extensions	UpperCamelCase	AuthRepository, QuizScreen
+	Variables, Functions, Parameters	lowerCamelCase	userToken, calculateScore()
+	Files, Directories, Packages	snake_case	auth_service.dart, /quiz_feature
+Python (FastAPI)	Classes	UpperCamelCase	DatabaseConnection, UserResponse
+	Variables, Functions, Modules	snake_case	db_session, get_user_by_id()
+	Constants (Global / Module level)	UPPER_SNAKE_CASE	MAX_LOGIN_ATTEMPTS, JWT_SECRET
+Database (SQL)	Tables, Columns	snake_case (Singular tables)	user, quiz_result, created_at
+	Primary & Foreign Keys	snake_case	id, user_id (matches parent table)
+2. Flutter / Dart Coding Standards
+• Enforce flutter_lints: Never commit code with active linter warnings. Maximize the use of const constructors to improve UI rendering performance.
+
+• Avoid Deep Nesting: If a widget tree extends beyond 3 levels of indentation, extract structural parts into separate private standalone widgets or layout blocks (_BuildSubmitButton).
+
+• State Management Isolation: Do not place business logic or raw HTTP requests inside components that inherit from StatefulWidget. Keep UI dumb; let business logic components (Bloc, Notifier, Cubit) manage the data cycle.
+
+3. Python / FastAPI Coding Standards
+• PEP 8 Compliance: Enforce formatting strictly via tools like Black or Ruff.
+
+• Strict Type Hinting: Every function definition must specify argument types and return signatures.
+Python
+
+# Good
+def compute_percentage(score: int, total: int) -> float:
+    return (score / total) * 100
+
+• Asynchronous Processing: Use async def for endpoints communicating with external inputs or I/O resources (like databases or third-party APIs). For CPU-heavy math operations, use standard synchronous def blocks to avoid locking the event loop.
+
+4. Database Design & Integrity Standards
+• Deterministic Migrations: Never alter production database structures manually. Every change must be executed via declarative structural migrations (e.g., Alembic for Python/SQLAlchemy).
+
+• Indexes: Create clear indexes on any columns frequently appearing within a query's WHERE, JOIN, or ORDER BY operational statements (e.g., index email on the user table).
+
+• Soft Deletes: Critical business information or tracking records must never be structurally removed via a direct DELETE command. Implement an index-optimized is_deleted boolean flag or a nullable deleted_at timestamp.
+
+5. Error Handling Patterns
+Robust applications expect failures and recover safely without exposing internal system internals to consumers.
+Python / Backend
+• Never swallow exceptions: Avoid blank except: pass logic. Always capture, log, or transparently act on errors.
+
+• Fail Fast & Standardize Responses: Raise standard HTTP status exceptions early inside service layers. FastAPI will naturally bubble these cleanly back to the client:
+Python
+
+if not user:
+    raise HTTPException(status_code=404, detail="User target not found")
+
+Flutter / Frontend
+• Functional Error Tracking: Wrap external network or state calls inside structured try-catch blocks. Map exceptions down into distinct functional types (e.g., Failure models) instead of blindly letting raw application crashes hit the user.
+
+• User-Friendly Notifications: System failures or timeouts must display contextual text to the user (e.g., via SnackBar or Dialog component) instead of cryptic developer terms like HttpException 500.
+
+6. Comments vs. Documentation
+Code should express what is happening. Comments and documentation explain why it was done that way.
+Code Comments (Internal)
+• Write "Why" comments: Do not state what the code visibly does. Explain the edge case it resolves.
+Python
+
+# Good: This specific offset adjustment avoids an array out-of-bounds error when processing localized payloads.
+offset = base_length - 1
+
+# Bad: Subtract one from base length.
+offset = base_length - 1
+
+Structural Documentation (External API Reference)
+• Flutter (DartDoc): Use triple slashes (///) above public methods, features, or architectural classes.
+Dart
+
+/// Submits user response payloads directly to the primary storage repository.
+/// Throws a [NetworkException] if connection timeouts occur.
+Future<void> submitQuizResponse(QuizAnswer answer) async { ... }
+
+• Python (Docstrings): Use triple quotes (""") following PEP 257 standards to populate automated OpenAPI configurations dynamically inside FastAPI endpoints.
+Python
+
+@router.post("/chat")
+async def process_ai_chat(payload: ChatRequest):
+    """
+    Accepts user chat parameters, pushes statements to the LLM backend processing engine,
+    and saves responses into history tracking tables.
+    """
+
+7. Testing Standards
+Untested code is broken by design. Enforce continuous structural test execution across your stack.
+Test Isolation
+• FastAPI Suite: Unit tests inside the backend must run on an isolated, transactional database profile. Use tools like conftest.py to truncate or rollback transactions at the end of every individual test execution, preventing database side-effects.
+
+• Flutter Suite: UI and integration checks should rely on deterministic mock classes (using packages like mocktail or mockito). Do not hit external staging endpoints or depend on an active internet connection during tests.
+
+Coverage & Assertions
+• Target Core Code: Strive for at least 80% coverage on core business logic, utility blocks, and service layers.
+
+• One Focus per Unit Test: Structure tests along the Arrange-Act-Assert (AAA) pattern. Verify exactly one intentional outcome or single side-effect per test method to keep failures trivial to debug.

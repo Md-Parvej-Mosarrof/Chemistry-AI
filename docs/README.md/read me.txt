@@ -1,0 +1,178 @@
+# Chemistry AI
+
+An AI-powered platform for learning, teaching, and exploring chemistry — combining conversational tutoring, deterministic chemistry computation, and interactive visualization in one place.
+
+---
+
+## Table of Contents
+1. Introduction
+2. Features
+3. Technology
+4. Folder Structure
+5. Installation
+6. Future Plan
+7. Contributing
+8. License
+
+---
+
+## 1. Introduction
+
+**Chemistry AI** is a web and mobile platform designed to help students, educators, and researchers engage with chemistry more intuitively. It pairs a large language model (LLM) for natural-language explanation with deterministic chemistry engines (equation balancing, stoichiometry, molecular property calculation) — so answers are both easy to understand and factually reliable.
+
+The platform supports individual learners, classroom use by teachers, and institutional deployment, with tools ranging from an AI chemistry tutor and reaction predictor to adaptive quizzes and virtual lab simulations.
+
+**Who it's for:**
+- Students studying chemistry at secondary or university level
+- Teachers managing classrooms, assignments, and progress tracking
+- Institutions integrating chemistry tools into existing LMS platforms
+- Researchers needing quick molecular property lookups and reaction insights
+
+---
+
+## 2. Features
+
+- **AI Chemistry Tutor** — Conversational Q&A with adjustable explanation depth (school, college, advanced).
+- **Equation Balancer & Stoichiometry Calculator** — Balances chemical equations and computes moles, mass, limiting reagent, and percent yield.
+- **Molecular Structure Tools** — Input via SMILES, file upload, or hand-drawn image; view 2D/3D visualizations and calculate molecular properties.
+- **Reaction Prediction** — Predicts likely products and mechanisms for common organic and inorganic reactions.
+- **Adaptive Quizzes** — Auto-generated practice questions with difficulty that adjusts to performance.
+- **Virtual Labs** — Simulated experiments (titration, distillation) with built-in safety guidance.
+- **Progress Tracking & Reporting** — Dashboards for students, teachers, and institution admins.
+- **Reference Library** — Interactive periodic table, glossary, and unit conversion tools.
+- **LMS & API Integration** — Connects with Google Classroom, Moodle, Canvas via LTI, plus a documented REST API.
+
+---
+
+## 3. Technology
+
+| Layer | Stack |
+|---|---|
+| Frontend | Next.js, TypeScript, Tailwind CSS, React Native (mobile) |
+| Backend | NestJS (Node.js) for core services, FastAPI (Python) for AI/chemistry logic |
+| Database | PostgreSQL (primary), Redis (cache/session), MongoDB (optional flexible content) |
+| Authentication | Auth0 / Firebase Auth, OAuth 2.0, JWT sessions |
+| AI | Claude API (reasoning/tutoring), RDKit (cheminformatics) |
+| Hosting | AWS (EKS, S3, CloudFront) |
+| Notifications | Firebase Cloud Messaging, SendGrid, Twilio (optional) |
+| Analytics | Mixpanel, Google Analytics, Metabase |
+
+See `/docs/architecture.md` for a detailed breakdown of how these components interact.
+
+---
+
+## 4. Folder Structure
+
+```
+chemistry-ai/
+├── apps/
+│   ├── web/                  # Next.js web application
+│   └── mobile/               # React Native mobile application
+├── services/
+│   ├── auth-service/         # Authentication & user management
+│   ├── quiz-engine/          # Quiz generation, grading, adaptive logic
+│   ├── reaction-engine/      # Reaction prediction & mechanism logic (Python/FastAPI)
+│   ├── molecular-viewer/     # Structure parsing, 2D/3D rendering support
+│   ├── ai-tutor/             # Conversational AI tutoring service
+│   └── notification-service/ # Push, email, SMS notifications
+├── packages/
+│   ├── ui-components/        # Shared React component library
+│   ├── types/                # Shared TypeScript types/interfaces
+│   └── config/                # Shared lint, tsconfig, and build configs
+├── prompts/                  # Version-controlled AI prompt templates
+├── docs/
+│   ├── architecture.md
+│   ├── srs.md
+│   └── feature-list.md
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── regression/           # Known-tricky chemistry query regression set
+├── scripts/                  # Build, deploy, and migration scripts
+├── .env.example
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
+
+---
+
+## 5. Installation
+
+### Prerequisites
+- Node.js 18+
+- Python 3.10+
+- Docker & Docker Compose
+- PostgreSQL 14+ (or use the provided Docker setup)
+
+### Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/chemistry-ai.git
+cd chemistry-ai
+
+# 2. Copy environment variables
+cp .env.example .env
+# Fill in required values: database URL, Auth0 keys, Claude API key, etc.
+
+# 3. Install dependencies
+npm install
+
+# 4. Start supporting services (Postgres, Redis) via Docker
+docker-compose up -d
+
+# 5. Run database migrations
+npm run db:migrate
+
+# 6. Start the backend services
+npm run dev:services
+
+# 7. Start the web app
+npm run dev:web
+```
+
+The web app will be available at `http://localhost:3000`. API services default to `http://localhost:4000`.
+
+### Running Tests
+
+```bash
+npm run test           # Unit tests
+npm run test:integration
+npm run test:regression  # Chemistry accuracy regression suite
+```
+
+---
+
+## 6. Future Plan
+
+- **Multi-language support** — Expanding beyond English to serve a wider global student base.
+- **AR/VR lab simulations** — Immersive, hands-on virtual chemistry experiments.
+- **Real-time collaborative labs** — Multi-user virtual lab sessions for group work.
+- **Advanced computational chemistry** — Integration with DFT and molecular dynamics tools for research-tier users.
+- **Offline-first mobile mode** — Expanded offline access to reference tools in low-connectivity regions.
+- **Predictive analytics** — Early identification of at-risk students based on engagement trends.
+- **Plugin marketplace** — A public API ecosystem for third-party developers to extend the platform.
+
+See `/docs/feature-list.md` for the full versioned roadmap (V1–V3).
+
+---
+
+## 7. Contributing
+
+Contributions are welcome. Please read `/docs/development-rules.md` before submitting a pull request — it covers coding style, commit conventions, testing requirements, and guidelines specific to AI-assisted development used across this codebase.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/your-feature`)
+3. Commit using [Conventional Commits](https://www.conventionalcommits.org/) format
+4. Open a pull request with a clear description and linked issue (if applicable)
+
+---
+
+## 8. License
+
+This project is licensed under the terms specified in the `LICENSE` file. Please review it before use or distribution.
+
+---
+
+*For questions or support, contact the Chemistry AI engineering team.*

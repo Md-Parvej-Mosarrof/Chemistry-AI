@@ -1,0 +1,612 @@
+# Building a Professional Chemistry Learning App with Flutter
+
+I'll walk you through this as if we're setting up a production-grade app together — architecture decisions, folder structure, and working code for every layer.
+
+## 1. Project Setup
+
+```bash
+flutter create chemistry_learning_app
+cd chemistry_learning_app
+```
+
+Set the minimum SDK constraints in `pubspec.yaml` to something recent (Dart 3.x) since we'll use pattern matching and Riverpod's newer generator APIs.
+
+### Dependencies
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Data modeling
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+
+  # Networking / local storage (adjust to your backend)
+  dio: ^5.4.3
+  shared_preferences: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Utility
+  equatable: ^2.0.5
+
+dev_dependencies:
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  flutter_lints: ^4.0.0
+```
+
+**Why these choices:**
+- **Riverpod generator** over plain Riverpod: type-safe, less boilerplate, better DevTools support — the standard for new projects in 2025+.
+- **GoRouter**: Google's officially recommended declarative router; handles deep links, nested navigation, and redirects cleanly.
+- **Freezed**: immutable models + union types (great for chemistry data like `Element`, `Reaction`, `QuizQuestion`, and for sealed state classes).
+- **Hive**: fast local storage for offline chemistry reference data (periodic table, formulas) without needing SQL.
+
+Run:
+```bash
+flutter pub get
+```
+
+## 2. Why Clean Architecture Here
+
+For a chemistry app, you'll have distinct concerns:
+- **Domain**: what a "Chemical Element," "Reaction," or "Quiz" *is*, independent of how it's stored or displayed.
+- **Data**: fetching elements from an API/local JSON/Hive cache.
+- **Presentation**: periodic table grid, lesson screens, quiz UI.
+
+Clean Architecture keeps these independent so you can swap a REST API for GraphQL, or swap Riverpod state logic, without touching business rules.
+
+## 3. Scalable Folder Structure
+
+```
+lib/
+├── main.dart
+├── bootstrap.dart
+├── core/
+│   ├── constants/
+│   │   └── app_constants.dart
+│   ├── error/
+│   │   ├── exceptions.dart
+│   │   └── failures.dart
+│   ├── network/
+│   │   └── dio_client.dart
+│   ├── theme/
+│   │   ├── app_theme.dart
+│   │   ├── app_colors.dart
+│   │   └── app_text_styles.dart
+│   ├── localization/
+│   │   ├── app_localizations.dart (generated)
+│   │   └── l10n/
+│   │       ├── app_en.arb
+│   │       └── app_bn.arb
+│   ├── routing/
+│   │   ├── app_router.dart
+│   │   └── route_paths.dart
+│   ├── usecase/
+│   │   └── usecase.dart
+│   └── utils/
+│       └── extensions.dart
+│
+├── features/
+│   ├── periodic_table/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   │   ├── element_local_datasource.dart
+│   │   │   │   └── element_remote_datasource.dart
+│   │   │   ├── models/
+│   │   │   │   └── element_model.dart
+│   │   │   └── repositories/
+│   │   │       └── element_repository_impl.dart
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   └── element_entity.dart
+│   │   │   ├── repositories/
+│   │   │   │   └── element_repository.dart
+│   │   │   └── usecases/
+│   │   │       ├── get_all_elements.dart
+│   │   │       └── get_element_by_symbol.dart
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       │   └── element_providers.dart
+│   │       ├── screens/
+│   │       │   ├── periodic_table_screen.dart
+│   │       │   └── element_detail_screen.dart
+│   │       └── widgets/
+│   │           └── element_tile.dart
+│   │
+│   ├── lessons/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │
+│   ├── quiz/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │
+│   └── settings/
+│       ├── data/
+│       ├── domain/
+│       └── presentation/
+│           ├── providers/
+│           │   └── theme_provider.dart
+│           └── screens/
+│               └── settings_screen.dart
+│
+└── shared/
+    ├── widgets/
+    │   ├── app_scaffold.dart
+    │   └── loading_indicator.dart
+    └── models/
+```
+
+**Rationale for each top-level folder:**
+- `core/` — cross-cutting code shared by *every* feature: theming, routing, localization, error types, network client. Nothing feature-specific goes here.
+- `features/` — one folder per learning domain (periodic table, lessons, quizzes, settings). Each is a self-contained vertical slice with its own data/domain/presentation, so a new dev can work on `quiz/` without touching `periodic_table/`.
+- `shared/` — small reusable widgets/models used across 2+ features, but not core infrastructure.
+
+This structure scales because adding a new feature (e.g., "molecular_visualizer") means adding one new folder — never modifying existing ones.
+
+## 4. Domain Layer — Entities, Repository Contracts, Use Cases
+
+Domain has **zero Flutter/Riverpod/Dio imports** — pure Dart. This is what makes it testable and swappable.
+
+```dart
+// features/periodic_table/domain/entities/element_entity.dart
+class ElementEntity {
+  final int atomicNumber;
+  final String symbol;
+  final String name;
+  final double atomicMass;
+  final String category; // e.g. "Noble Gas", "Alkali Metal"
+
+  const ElementEntity({
+    required this.atomicNumber,
+    required this.symbol,
+    required this.name,
+    required this.atomicMass,
+    required this.category,
+  });
+}
+```
+
+```dart
+// features/periodic_table/domain/repositories/element_repository.dart
+import 'package:dartz/dartz.dart'; // or a custom Result type
+import '../../../../core/error/failures.dart';
+import '../entities/element_entity.dart';
+
+abstract class ElementRepository {
+  Future<Either<Failure, List<ElementEntity>>> getAllElements();
+  Future<Either<Failure, ElementEntity>> getElementBySymbol(String symbol);
+}
+```
+
+Using `Either<Failure, T>` (from `dartz` or a hand-rolled sealed `Result` class) forces callers to handle errors explicitly instead of throwing exceptions across layers.
+
+```dart
+// core/usecase/usecase.dart
+abstract class UseCase<Type, Params> {
+  Future<Type> call(Params params);
+}
+
+class NoParams {
+  const NoParams();
+}
+```
+
+```dart
+// features/periodic_table/domain/usecases/get_all_elements.dart
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/failures.dart';
+import '../../../../core/usecase/usecase.dart';
+import '../entities/element_entity.dart';
+import '../repositories/element_repository.dart';
+
+class GetAllElements implements UseCase<Either<Failure, List<ElementEntity>>, NoParams> {
+  final ElementRepository repository;
+  GetAllElements(this.repository);
+
+  @override
+  Future<Either<Failure, List<ElementEntity>>> call(NoParams params) {
+    return repository.getAllElements();
+  }
+}
+```
+
+**Why use cases at all?** Each represents one business action ("get all elements," "submit quiz answer," "mark lesson complete"). It keeps presentation logic thin — a widget calls one use case instead of orchestrating repository + validation logic itself.
+
+## 5. Data Layer — Models, Datasources, Repository Implementation
+
+```dart
+// features/periodic_table/data/models/element_model.dart
+import '../../domain/entities/element_entity.dart';
+
+class ElementModel extends ElementEntity {
+  const ElementModel({
+    required super.atomicNumber,
+    required super.symbol,
+    required super.name,
+    required super.atomicMass,
+    required super.category,
+  });
+
+  factory ElementModel.fromJson(Map<String, dynamic> json) {
+    return ElementModel(
+      atomicNumber: json['atomicNumber'] as int,
+      symbol: json['symbol'] as String,
+      name: json['name'] as String,
+      atomicMass: (json['atomicMass'] as num).toDouble(),
+      category: json['category'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'atomicNumber': atomicNumber,
+        'symbol': symbol,
+        'name': name,
+        'atomicMass': atomicMass,
+        'category': category,
+      };
+}
+```
+
+`ElementModel` extends `ElementEntity` — it adds serialization but is still usable wherever the domain expects an entity. This is the standard Clean Architecture trick to avoid duplicate mapping code for simple cases.
+
+```dart
+// features/periodic_table/data/datasources/element_local_datasource.dart
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+import '../models/element_model.dart';
+
+abstract class ElementLocalDataSource {
+  Future<List<ElementModel>> getCachedElements();
+}
+
+class ElementLocalDataSourceImpl implements ElementLocalDataSource {
+  @override
+  Future<List<ElementModel>> getCachedElements() async {
+    final jsonStr = await rootBundle.loadString('assets/data/elements.json');
+    final List<dynamic> jsonList = json.decode(jsonStr);
+    return jsonList.map((e) => ElementModel.fromJson(e)).toList();
+  }
+}
+```
+
+```dart
+// features/periodic_table/data/repositories/element_repository_impl.dart
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/failures.dart';
+import '../../domain/entities/element_entity.dart';
+import '../../domain/repositories/element_repository.dart';
+import '../datasources/element_local_datasource.dart';
+
+class ElementRepositoryImpl implements ElementRepository {
+  final ElementLocalDataSource localDataSource;
+  ElementRepositoryImpl(this.localDataSource);
+
+  @override
+  Future<Either<Failure, List<ElementEntity>>> getAllElements() async {
+    try {
+      final elements = await localDataSource.getCachedElements();
+      return Right(elements);
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ElementEntity>> getElementBySymbol(String symbol) async {
+    try {
+      final elements = await localDataSource.getCachedElements();
+      final match = elements.firstWhere((e) => e.symbol == symbol);
+      return Right(match);
+    } catch (e) {
+      return Left(CacheFailure('Element not found'));
+    }
+  }
+}
+```
+
+The repository decides *which* datasource to use (local JSON now; swap to `ElementRemoteDataSource` with Dio later) — presentation code never knows or cares.
+
+## 6. Riverpod — Wiring Dependencies and Managing State
+
+Using the code-generator syntax (`@riverpod`) is cleaner and gives compile-time safety.
+
+```dart
+// features/periodic_table/presentation/providers/element_providers.dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../data/datasources/element_local_datasource.dart';
+import '../../data/repositories/element_repository_impl.dart';
+import '../../domain/entities/element_entity.dart';
+import '../../domain/repositories/element_repository.dart';
+import '../../domain/usecases/get_all_elements.dart';
+import '../../../../core/usecase/usecase.dart';
+
+part 'element_providers.g.dart';
+
+@riverpod
+ElementLocalDataSource elementLocalDataSource(ElementLocalDataSourceRef ref) {
+  return ElementLocalDataSourceImpl();
+}
+
+@riverpod
+ElementRepository elementRepository(ElementRepositoryRef ref) {
+  return ElementRepositoryImpl(ref.watch(elementLocalDataSourceProvider));
+}
+
+@riverpod
+GetAllElements getAllElementsUseCase(GetAllElementsUseCaseRef ref) {
+  return GetAllElements(ref.watch(elementRepositoryProvider));
+}
+
+@riverpod
+class ElementList extends _$ElementList {
+  @override
+  Future<List<ElementEntity>> build() async {
+    final result = await ref.watch(getAllElementsUseCaseProvider)(const NoParams());
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (elements) => elements,
+    );
+  }
+}
+```
+
+Run the generator whenever you add `@riverpod` code:
+```bash
+dart run build_runner watch -d
+```
+
+**Why this layering matters:** every provider depends only on the layer directly below it. Testing `ElementList` means mocking `GetAllElements` — you never need a real JSON file or widget tree.
+
+Consuming it in UI:
+
+```dart
+// features/periodic_table/presentation/screens/periodic_table_screen.dart
+class PeriodicTableScreen extends ConsumerWidget {
+  const PeriodicTableScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final elementsAsync = ref.watch(elementListProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.periodicTableTitle)),
+      body: elementsAsync.when(
+        data: (elements) => GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
+          itemCount: elements.length,
+          itemBuilder: (context, index) => ElementTile(element: elements[index]),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+      ),
+    );
+  }
+}
+```
+
+`AsyncValue.when` handles loading/error/data states declaratively — no manual `isLoading` booleans scattered around.
+
+## 7. GoRouter — Declarative Navigation
+
+```dart
+// core/routing/route_paths.dart
+class RoutePaths {
+  static const home = '/';
+  static const periodicTable = '/periodic-table';
+  static const elementDetail = '/periodic-table/:symbol';
+  static const lessons = '/lessons';
+  static const quiz = '/quiz';
+  static const settings = '/settings';
+}
+```
+
+```dart
+// core/routing/app_router.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../features/periodic_table/presentation/screens/periodic_table_screen.dart';
+import '../../features/periodic_table/presentation/screens/element_detail_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
+import 'route_paths.dart';
+
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: RoutePaths.periodicTable,
+    routes: [
+      GoRoute(
+        path: RoutePaths.periodicTable,
+        builder: (context, state) => const PeriodicTableScreen(),
+        routes: [
+          GoRoute(
+            path: ':symbol', // nested -> /periodic-table/Fe
+            builder: (context, state) {
+              final symbol = state.pathParameters['symbol']!;
+              return ElementDetailScreen(symbol: symbol);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: RoutePaths.settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+    ],
+  );
+});
+```
+
+Wrapping `GoRouter` in a Riverpod `Provider` means routes can react to app state later (e.g., redirecting to a login screen if you add auth) via `ref.watch` inside a `redirect` callback.
+
+## 8. Dark Mode via Riverpod
+
+```dart
+// features/settings/presentation/providers/theme_provider.dart
+import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+part 'theme_provider.g.dart';
+
+@riverpod
+class ThemeModeController extends _$ThemeModeController {
+  static const _key = 'theme_mode';
+
+  @override
+  ThemeMode build() {
+    _loadSaved();
+    return ThemeMode.system;
+  }
+
+  Future<void> _loadSaved() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_key);
+    if (saved != null) {
+      state = ThemeMode.values.firstWhere((e) => e.name == saved);
+    }
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    state = mode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, mode.name);
+  }
+}
+```
+
+```dart
+// core/theme/app_theme.dart
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static ThemeData get light => ThemeData(
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        useMaterial3: true,
+      );
+
+  static ThemeData get dark => ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.teal,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      );
+}
+```
+
+Persisting the preference (not just toggling state) matters for a learning app users open daily — nobody wants to re-pick dark mode every launch.
+
+## 9. Localization
+
+```yaml
+# pubspec.yaml — add this section
+flutter:
+  generate: true
+```
+
+```yaml
+# l10n.yaml (project root)
+arb-dir: lib/core/localization/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+```
+
+```json
+// lib/core/localization/l10n/app_en.arb
+{
+  "@@locale": "en",
+  "appTitle": "ChemLearn",
+  "periodicTableTitle": "Periodic Table",
+  "quizScore": "Your score: {score} / {total}",
+  "@quizScore": {
+    "placeholders": { "score": {}, "total": {} }
+  }
+}
+```
+
+```json
+// lib/core/localization/l10n/app_bn.arb
+{
+  "@@locale": "bn",
+  "appTitle": "কেমলার্ন",
+  "periodicTableTitle": "পর্যায় সারণী",
+  "quizScore": "আপনার স্কোর: {score} / {total}"
+}
+```
+
+Since you're based in Bangladesh, adding Bengali (`bn`) alongside English is a natural second locale for this app — but any ISO locale code works the same way.
+
+Run `flutter gen-l10n` (or it runs automatically on build) to generate `AppLocalizations`.
+
+## 10. Tying It Together in `main.dart`
+
+```dart
+// main.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/localization/app_localizations.dart';
+import 'core/routing/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'features/settings/presentation/providers/theme_provider.dart';
+
+void main() {
+  runApp(const ProviderScope(child: ChemistryApp()));
+}
+
+class ChemistryApp extends ConsumerWidget {
+  const ChemistryApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(themeModeControllerProvider);
+
+    return MaterialApp.router(
+      title: 'ChemLearn',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
+      routerConfig: router,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+    );
+  }
+}
+```
+
+Everything converges here: `ProviderScope` at the root enables Riverpod app-wide, `MaterialApp.router` wires GoRouter, and `themeMode`/`localizationsDelegates` complete dark mode + i18n.
+
+## 11. Suggested Build Order
+
+1. Scaffold `core/` (theme, routing skeleton, error types) — get the app running with a blank home screen first.
+2. Build **one** feature end-to-end (periodic_table) through all three layers, to validate the architecture works before copying the pattern.
+3. Add localization once you have real UI text to translate.
+4. Add dark mode toggle in Settings screen.
+5. Repeat the feature pattern for `lessons` and `quiz`.
+6. Add tests per layer: domain (pure unit tests, no mocks needed for entities; mock repository for use cases), data (mock datasources), presentation (widget tests with `ProviderScope overrides`).
+
+A natural next feature to flesh out is the **quiz** module, since it'll exercise Riverpod state notifiers more heavily (tracking current question, score, timer) than the periodic table did. Want me to build that one out next, following the same architecture?

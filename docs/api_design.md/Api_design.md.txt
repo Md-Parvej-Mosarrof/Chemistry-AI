@@ -1,0 +1,297 @@
+﻿Global Design Choices
+• Base URL: [https://api.rxnlearn.com/v1](https://api.rxnlearn.com/v1)
+
+• Format: application/json for all requests and responses.
+
+• Authentication: Stateless JWT Bearer Token passed in the Authorization header.
+
+• Standard Error Wrapper: All 4xx and 5xx responses follow this structure:
+JSON
+
+{
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "The requested reaction ID does not exist.",
+    "details": []
+  }
+}
+
+1. Authentication (/auth)
+Register a User
+• Endpoint: POST /auth/register
+
+• Request Body:
+JSON
+
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "password": "StrongPassword123!"
+}
+
+• Response: 201 Created
+JSON
+
+{
+  "message": "User registered successfully.",
+  "user_id": "usr_9481a7b"
+}
+
+Log In User
+• Endpoint: POST /auth/login
+
+• Request Body:
+JSON
+
+{
+  "email": "jane.doe@example.com",
+  "password": "StrongPassword123!"
+}
+
+• Response: 200 OK
+JSON
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+
+2. Reaction Search (/reactions)
+Search & Filter Reactions
+• Endpoint: GET /reactions
+
+• Query Parameters: q=Grignard, type=organic, page=1, limit=10
+
+• Response: 200 OK
+JSON
+
+{
+  "data": [
+    {
+      "id": "rxn_001",
+      "name": "Grignard Reaction",
+      "type": "organic",
+      "smiles_equation": "R-MgX + R'-CO-R'' -> R'R''(R)C-OH",
+      "difficulty": "Intermediate"
+    }
+  ],
+  "pagination": {
+    "current_page": 1,
+    "total_pages": 4,
+    "total_items": 38
+  }
+}
+
+3. Reaction Details (/reactions/{id})
+Get Reaction Detail
+• Endpoint: GET /reactions/{id}
+
+• Response: 200 OK
+JSON
+
+{
+  "id": "rxn_001",
+  "name": "Grignard Reaction",
+  "description": "The addition of an organomagnesium halide to a ketone or aldehyde to form a tertiary or secondary alcohol.",
+  "mechanism_steps": [
+    "Nucleophilic attack of the carbanion on the carbonyl carbon.",
+    "Formation of a tetrahedral alkoxide intermediate.",
+    "Protonation by dilute acid during workup to yield the alcohol."
+  ],
+  "reactants": ["Ketone", "Organomagnesium Halide"],
+  "products": ["Tertiary Alcohol"],
+  "conditions": {
+    "solvent": "Anhydrous Diethyl Ether",
+    "temperature": "0°C to 25°C"
+  }
+}
+
+4. Quizzes (/quizzes)
+Get a Random/Targeted Quiz
+• Endpoint: GET /quizzes
+
+• Query Parameters: difficulty=Intermediate&limit=1
+
+• Response: 200 OK
+JSON
+
+{
+  "quiz_id": "qiz_8832",
+  "title": "Organic Mechanisms Quiz",
+  "questions": [
+    {
+      "question_id": "qn_01",
+      "text": "Which solvent is essential for a Grignard reaction to prevent decomposition?",
+      "options": [
+        {"id": "a", "text": "Water"},
+        {"id": "b", "text": "Ethanol"},
+        {"id": "c", "text": "Anhydrous Diethyl Ether"},
+        {"id": "d", "text": "Acetone"}
+      ]
+    }
+  ]
+}
+
+Submit Quiz Answers
+• Endpoint: POST /quizzes/{id}/submit
+
+• Request Body:
+JSON
+
+{
+  "answers": [
+    {
+      "question_id": "qn_01",
+      "selected_option_id": "c"
+    }
+  ]
+}
+
+• Response: 200 OK
+JSON
+
+{
+  "score": 100,
+  "total_questions": 1,
+  "correct_answers": 1,
+  "results": [
+    {
+      "question_id": "qn_01",
+      "is_correct": true,
+      "correct_option_id": "c",
+      "explanation": "Grignard reagents are highly reactive towards protic solvents like water or ethanol, making anhydrous ether crucial."
+    }
+  ]
+}
+
+5. Bookmarks (/bookmarks)
+Add a Bookmark
+• Endpoint: POST /bookmarks
+
+• Request Body:
+JSON
+
+{
+  "item_type": "reaction",
+  "item_id": "rxn_001"
+}
+
+• Response: 201 Created
+JSON
+
+{
+  "bookmark_id": "bmk_1102",
+  "item_id": "rxn_001",
+  "bookmarked_at": "2026-07-16T17:05:00Z"
+}
+
+Get Bookmarks
+• Endpoint: GET /bookmarks
+
+• Response: 200 OK
+JSON
+
+{
+  "bookmarks": [
+    {
+      "bookmark_id": "bmk_1102",
+      "item_type": "reaction",
+      "item_details": {
+        "id": "rxn_001",
+        "name": "Grignard Reaction"
+      }
+    }
+  ]
+}
+
+6. AI Chat (/ai/chat)
+Send a Message to the AI Agent
+• Endpoint: POST /ai/chat
+
+• Request Body:
+JSON
+
+{
+  "conversation_id": "chat_550e8400",
+  "message": "Why does the Grignard reagent act as a nucleophile?"
+}
+
+• Response: 200 OK
+JSON
+
+{
+  "conversation_id": "chat_550e8400",
+  "reply": "Because the carbon-magnesium bond is highly polar covalent, leaving a substantial partial negative charge on the carbon atom, turning it into a powerful nucleophile.",
+  "timestamp": "2026-07-16T17:06:12Z"
+}
+
+7. History (/history)
+Get User Activity History
+• Endpoint: GET /history
+
+• Query Parameters: limit=5
+
+• Response: 200 OK
+JSON
+
+{
+  "history": [
+    {
+      "activity_id": "hist_0921",
+      "action": "viewed_reaction",
+      "target_id": "rxn_001",
+      "description": "Viewed Grignard Reaction details",
+      "timestamp": "2026-07-16T17:00:00Z"
+    },
+    {
+      "activity_id": "hist_0920",
+      "action": "completed_quiz",
+      "target_id": "qiz_8832",
+      "description": "Scored 100% on Organic Mechanisms Quiz",
+      "timestamp": "2026-07-16T16:55:00Z"
+    }
+  ]
+}
+
+8. Language Preferences (/settings/language)
+Update Interface/Content Language
+• Endpoint: PUT /settings/language
+
+• Request Body:
+JSON
+
+{
+  "language_code": "de-DE"
+}
+
+• Response: 200 OK
+JSON
+
+{
+  "language_code": "de-DE",
+  "status": "Language preference updated successfully."
+}
+
+9. User Profile (/users/me)
+Get Current User Profile
+• Endpoint: GET /users/me
+
+• Response: 200 OK
+JSON
+
+{
+  "id": "usr_9481a7b",
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "profile_picture": "https://assets.rxnlearn.com/profiles/usr_9481a7b.png",
+  "preferences": {
+    "language": "de-DE",
+    "theme": "dark"
+  },
+  "stats": {
+    "quizzes_taken": 14,
+    "average_score": 88.5,
+    "total_bookmarks": 5
+  }
+}

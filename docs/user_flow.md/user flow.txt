@@ -1,0 +1,8 @@
+This is the core linear journey through Chemistry AI: from opening the app to searching a reaction, getting AI-generated products, reviewing the explanation, testing knowledge with a quiz, chatting further with the AI, and finally saving the session to history.
+A few notes on the design choices:
+
+Gray marks the entry and exit points (open app, save history).
+Teal marks the core computational actions (search, get products, quiz).
+Purple marks the AI-reasoning touchpoints (explanation, chat) — since those are where the model is actively generating and conversing rather than just computing a result.
+
+If you'd like, I can also produce a branching version (e.g. what happens if the reaction search fails, or if a user skips the quiz to go straight to chat) or turn this into a clickable UI mockup for the actual screens.

@@ -1,0 +1,71 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.coverage
+
+# Xcode
+ios/Pods/
+ios/Podfile.lock
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/.git/
+ios/.gitignore
+ios/.metadata
+ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.scheme
+ios/Runner.xcodeproj/xcuserdata/
+
+# Android
+android/.gradle
+android/.gradle/
+android/app/debug
+android/app/profile
+android/app/release
+android/app/outputs
+android/.android
+android/local.properties
+android/gradlew.bat
+android/gradlew
+*.jks
+*.keystore
+key.properties
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.iml
+*.lock
+
+# Misc
+/web/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.config.dart
+.env.dart

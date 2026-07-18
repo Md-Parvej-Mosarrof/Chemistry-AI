@@ -1,0 +1,64 @@
+Here's a recommended tech stack for Chemistry AI, organized by layer, with reasoning for each choice.
+Frontend
+React (Next.js) + TypeScript, Tailwind CSS, React Native (mobile)
+
+Next.js gives server-side rendering and static generation, which matters for SEO on public-facing content (periodic table pages, glossary, landing pages) while still supporting a rich, app-like interactive experience for the AI tutor and quizzes.
+TypeScript catches type errors early — important here since the app passes structured chemistry data (molecule objects, reaction payloads) between components, and silent type mismatches would be easy to miss otherwise.
+Tailwind CSS speeds up building a consistent, responsive design system across many feature screens (chat, quiz, lab simulator, dashboards) without hand-rolling CSS for each.
+React Native lets the mobile team reuse business logic and much of the UI layer from the web codebase, which matters a lot given the plan for feature parity across web and mobile in your roadmap.
+For 3D molecule rendering specifically: 3Dmol.js or Three.js (WebGL-based) is the standard choice — both are mature, free, and purpose-built (3Dmol.js especially) for molecular visualization.
+
+Backend
+Node.js (NestJS) for core API, Python (FastAPI) for AI/chemistry services
+
+A polyglot backend makes sense here rather than one language for everything: NestJS (Node/TypeScript) is well suited for the transactional, CRUD-heavy parts — user accounts, classrooms, quizzes, notifications — because it enforces clean modular architecture and shares types with the TypeScript frontend.
+FastAPI (Python) handles the AI/chemistry-computation microservices — equation balancing, stoichiometry, reaction prediction, molecular property calculation — because Python has the richest ecosystem for cheminformatics (RDKit, PubChemPy) and ML tooling. Trying to do this in Node would mean reinventing libraries that already exist and are well-tested in Python.
+Services communicate via internal REST/gRPC, so each part of the system can scale and deploy independently — this also matches the "microservices" direction called out in the SRS.
+
+Database
+PostgreSQL (primary), Redis (cache/session), MongoDB (optional, for flexible content)
+
+PostgreSQL is the system of record for structured, relational data — users, roles, classrooms, quiz results, progress tracking — where data integrity, foreign keys, and transactions matter (e.g., a quiz score should never be recorded without a valid student and quiz reference).
+Redis handles caching (e.g., frequently asked chemistry Q&A, periodic table lookups) and session/token storage, since it's fast and purpose-built for exactly this, reducing load on Postgres and speeding up response times.
+MongoDB is optional but useful if you want a flexible schema for semi-structured AI conversation logs or dynamically-shaped molecule metadata, where a rigid relational schema would be more friction than it's worth.
+
+Authentication
+Auth0 (or Firebase Auth) + OAuth 2.0 / OpenID Connect, JWT sessions
+
+Rather than building auth from scratch, Auth0 (or Firebase Auth as a cheaper alternative) provides SSO, MFA, password resets, and social login out of the box — all things explicitly required in the SRS — while offloading the security burden of correctly implementing these to a specialized vendor.
+JWT tokens are used for stateless session management across the microservices backend, which fits cleanly with the distributed architecture — any service can verify a token without a shared session store.
+For institutional customers, Auth0 also supports SAML/LTI-compatible SSO, which matters for the LMS integration requirement.
+
+AI
+Anthropic Claude API (reasoning/tutoring) + RDKit (cheminformatics) + custom fine-tuned models (optional, later)
+
+The Claude API (or a comparable LLM API) powers the conversational tutoring, natural-language Q&A, and explanation generation — this is the right layer for language understanding and pedagogical explanation, which general-purpose LLMs are strong at.
+RDKit (open-source cheminformatics library) handles the deterministic, factual parts: equation balancing, molecular property calculation, structure parsing (SMILES, MOL files). This is critical — LLMs alone are prone to numeric/factual errors, so pairing the LLM with a deterministic chemistry engine (as noted in the SRS's hybrid-approach constraint) reduces hallucination risk in exactly the areas where correctness matters most (stoichiometry, molecular weights).
+For reaction prediction, a combination of curated reaction databases (e.g., USPTO reaction datasets) with a fine-tuned model (later roadmap item) gives better accuracy than a general LLM alone, since reaction prediction is a narrow, well-studied ML problem with existing benchmarks.
+
+Hosting
+AWS (EKS for containers, S3 for storage, CloudFront CDN)
+
+AWS is chosen over smaller providers mainly for its maturity in compliance tooling (useful for GDPR/FERPA requirements) and its breadth of managed services, reducing the amount of infrastructure the team has to build and maintain itself.
+EKS (Kubernetes) runs the containerized microservices, giving the horizontal scalability called out in the performance requirements (handling exam-period traffic spikes) and independent deployability per service.
+S3 stores static assets and user-uploaded files (molecule images, exported reports); CloudFront serves these globally with low latency, which matters for an international student user base.
+(Alternative: Google Cloud Platform is a reasonable substitute if the team prefers GCP's AI/ML tooling, e.g. Vertex AI — worth considering since some cheminformatics tooling integrates well there too.)
+
+Notification
+Firebase Cloud Messaging (push) + SendGrid (email) + Twilio (SMS, optional)
+
+Firebase Cloud Messaging is the standard, free, cross-platform choice for push notifications on both web and mobile, meaning one integration covers both app types.
+SendGrid handles transactional email (quiz assignments, grade notifications, password resets) — chosen for its reliability and deliverability track record, which matters for time-sensitive academic notifications.
+Twilio is optional for SMS alerts (e.g., deadline reminders) if the institutional customers request it, but isn't core to v1.
+
+Analytics
+Mixpanel (product analytics) + Google Analytics (web traffic) + Metabase (internal BI dashboards)
+
+Mixpanel tracks user behavior and engagement (which features students use, quiz completion rates, drop-off points) — its event-based model fits well with tracking a learning journey rather than just page views.
+Google Analytics covers general web traffic and marketing-funnel analysis for the public-facing site, which is a separate concern from in-app product analytics.
+Metabase (open-source BI tool) powers the internal dashboards for teachers/institution admins described in the SRS (progress reports, class performance) — it's a good fit because it can query Postgres directly and is cheaper than building custom dashboard infrastructure from scratch.
+
+
+Summary table:
+LayerPrimary ChoiceWhy (one-line)FrontendNext.js + TypeScript + Tailwind, React NativeFast, type-safe, shared logic across web/mobileBackendNestJS (Node) + FastAPI (Python)Right tool per workload: CRUD vs. cheminformatics/AIDatabasePostgreSQL + Redis (+ optional MongoDB)Data integrity + speed + schema flexibilityAuthenticationAuth0 / Firebase AuthOffloads security-critical auth, SSO, MFAAIClaude API + RDKitLLM for language, deterministic engine for factsHostingAWS (EKS, S3, CloudFront)Compliance maturity, scalability, managed servicesNotificationFCM + SendGrid (+ Twilio)Cross-platform push, reliable email deliveryAnalyticsMixpanel + GA + MetabaseProduct engagement, traffic, internal BI
+Want me to turn this into a formatted document (Word/PDF) to sit alongside the SRS and feature list, or sketch an architecture diagram showing how these pieces connect?

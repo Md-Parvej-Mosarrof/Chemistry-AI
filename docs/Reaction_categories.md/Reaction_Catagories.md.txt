@@ -1,0 +1,121 @@
+﻿Chemical reactions can be classified in several ways depending on the level of study—ranging from simple structural rearrangements at the SSC level to electronic and mechanistic interpretations at the Honours level.
+Here is the complete, comprehensive classification of chemical reactions spanning from secondary to early university chemistry.
+1. Structural/Basic Classifications (SSC Level)
+These reactions focus primarily on how the reactants rearrange structurally to form products.
+A. Combination (Synthesis) Reaction
+Two or more substances (elements or compounds) combine to form a single new compound.
+• Mechanism: $A + B \rightarrow AB$
+
+• Example (SSC): Burning magnesium ribbon in air.
+$$2\text{Mg (s)} + \text{O}_2\text{ (g)} \rightarrow 2\text{MgO (s)}$$
+
+• Example (HSC/Honours): Synthesis of ammonia via the Haber-Bosch process.
+$$\text{N}_2\text{ (g)} + 3\text{H}_2\text{ (g)} \rightleftharpoons 2\text{NH}_3\text{ (g)}$$
+
+B. Decomposition Reaction
+A single compound breaks down into two or more simpler substances, usually triggered by heat (thermal), light (photolytic), or electricity (electrolytic).
+• Mechanism: $AB \rightarrow A + B$
+
+• Example (Thermal): Heating limestone.
+$$\text{CaCO}_3\text{ (s)} \xrightarrow{\Delta} \text{CaO (s)} + \text{CO}_2\text{ (g)}$$
+
+• Example (Electrolytic): Electrolysis of acidified water.
+$$2\text{H}_2\text{O (l)} \xrightarrow{\text{Electricity}} 2\text{H}_2\text{ (g)} + \text{O}_2\text{ (g)}$$
+
+C. Single Displacement (Substitution) Reaction
+An active element displaces a less active element from its salt solution. This is heavily dependent on the metal activity series.
+• Mechanism: $A + BC \rightarrow AC + B$
+
+• Example: Dipping a zinc plate into a blue copper sulfate solution. Zinc is more reactive than copper, so it displaces copper, fading the blue color.
+$$\text{Zn (s)} + \text{CuSO}_4\text{ (aq)} \rightarrow \text{ZnSO}_4\text{ (aq)} + \text{Cu (s)}$$
+
+D. Double Displacement (Metathesis) Reaction
+Two ionic compounds exchange their ions (cations and anions) to form two entirely new compounds.
+• Mechanism: $AB + CD \rightarrow AD + CB$
+
+• Example: Mixing sodium sulfate and barium chloride solutions.
+$$\text{Na}_2\text{SO}_4\text{ (aq)} + \text{BaCl}_2\text{ (aq)} \rightarrow \text{BaSO}_4\text{ (s)}\downarrow + 2\text{NaCl (aq)}$$
+
+E. Combustion Reaction
+An exothermic reaction where a substance (usually a hydrocarbon) reacts rapidly with oxygen, releasing heat, light, carbon dioxide, and water vapor.
+• Mechanism: $\text{Hydrocarbon} + \text{O}_2 \rightarrow \text{CO}_2 + \text{H}_2\text{O} + \Delta$
+
+• Example: Burning methane (natural gas).
+$$\text{CH}_4\text{ (g)} + 2\text{O}_2\text{ (g)} \rightarrow \text{CO}_2\text{ (g)} + 2\text{H}_2\text{O (g)} + \text{Heat}$$
+
+2. Solution & Analytical Classifications (HSC Level)
+These focus on the thermodynamic driving forces and particle interactions in aqueous environments.
+A. Acid-Base (Neutralization) Reaction
+According to Arrhenius/Brønsted-Lowry, an acid reacts with a base to form salt and water. At the Honours level, this is viewed as the transfer of a proton ($H^+$) or the sharing of an electron pair (Lewis theory).
+• Driving Force: The formation of stable water molecules ($\text{H}^+ + \text{OH}^- \rightarrow \text{H}_2\text{O}$).
+
+• Example: Hydrochloric acid neutralizing sodium hydroxide.
+$$\text{HCl (aq)} + \text{NaOH (aq)} \rightarrow \text{NaCl (aq)} + \text{H}_2\text{O (l)}$$
+
+B. Precipitation Reaction
+A sub-type of double displacement where two clear aqueous solutions mix to form an insoluble solid called a precipitate.
+• Example: Mixing silver nitrate and sodium chloride yields a thick, white precipitate of silver chloride.
+$$\text{AgNO}_3\text{ (aq)} + \text{NaCl (aq)} \rightarrow \text{AgCl (s)}\downarrow + \text{NaNO}_3\text{ (aq)}$$
+
+• Net Ionic Equation: $\text{Ag}^+\text{ (aq)} + \text{Cl}^-\text{ (aq)} \rightarrow \text{AgCl (s)}$
+
+C. Redox (Reduction-Oxidation) Reaction
+Reactions involving a complete or partial transfer of electrons. One species loses electrons (Oxidation / Reducing Agent) while another gains them (Reduction / Oxidizing Agent).
+• Key Concept: Oxidation Number changes.
+
+• Example: The reaction between iron(II) and potassium permanganate in an acidic medium (a classic HSC titrimetric reaction).
+$$\text{MnO}_4^- + 5\text{Fe}^{2+} + 8\text{H}^+ \rightarrow \text{Mn}^{2+} + 5\text{Fe}^{3+} + 4\text{H}_2\text{O}$$
+
+  • $\text{Fe}^{2+}$ is oxidized to $\text{Fe}^{3+}$ (Oxidation state increases from +2 to +3).
+
+  • $\text{Mn}$ in $\text{MnO}_4^-$ is reduced to $\text{Mn}^{2+}$ (Oxidation state decreases from +7 to +2).
+
+3. Advanced & Coordination Classifications (Honours 1st Year)
+These classifications dig deeper into molecular orbital interactions, coordination chemistry, and organic reaction mechanisms.
+A. Complex Formation Reaction
+A Lewis acid-base reaction where a central transition metal ion (Lewis acid) accepts electron pairs from surrounding molecules or ions called ligands (Lewis bases), forming coordinate covalent bonds.
+• Example: Copper(II) ions reacting with excess ammonia to form a deep blue complex.
+$$\text{Cu}^{2+}\text{ (aq)} + 4\text{NH}_3\text{ (aq)} \rightarrow [\text{Cu(NH}_3)_4]^{2+}\text{ (aq)}$$
+
+(Tetraamminecopper(II) ion)
+
+B. Organic Reactions
+Organic reactions are classified fundamentally by their mechanisms, breaking down how covalent bonds are cleft (homolytic vs. heterolytic) and formed.
+i. Addition Reactions
+Unsaturated molecules (alkenes/alkynes) add reagents across their $\pi$-bonds to become saturated.
+• Electrophilic Addition (Alkenes):
+$$\text{CH}_2=\text{CH}_2 + \text{HBr} \rightarrow \text{CH}_3-\text{CH}_2\text{Br}$$
+
+• Nucleophilic Addition (Carbonyls):
+$$\text{CH}_3\text{CHO} + \text{HCN} \rightarrow \text{CH}_3\text{CH(OH)CN} \quad \text{(Acetaldehyde cyanohydrin)}$$
+
+ii. Substitution Reactions
+An atom or a group of atoms in a molecule is replaced by another atom or group.
+• Nucleophilic Substitution ($S_N1$ / $S_N2$): Hydrolysis of alkyl halides.
+$$\text{CH}_3\text{CH}_2\text{Br} + \text{NaOH (aq)} \rightarrow \text{CH}_3\text{CH}_2\text{OH} + \text{NaBr}$$
+
+• Electrophilic Aromatic Substitution (EAS): Nitration of benzene.
+$$\text{C}_6\text{H}_6 + \text{HNO}_3 \xrightarrow{\text{H}_2\text{SO}_4} \text{C}_6\text{H}_5\text{NO}_2 + \text{H}_2\text{O}$$
+
+iii. Elimination Reactions
+Elements of a small molecule (like $\text{H}_2\text{O}$ or $\text{HCl}$) are removed from adjacent atoms of a reactant, creating a $\pi$-bond (unsaturation).
+• Example (Dehydrohalogenation):
+$$\text{CH}_3-\text{CH}_2\text{Br} + \text{KOH (alcoholic)} \xrightarrow{\Delta} \text{CH}_2=\text{CH}_2 + \text{KBr} + \text{H}_2\text{O}$$
+
+iv. Rearrangement Reactions
+The carbon skeleton or functional group arrangement of a molecule undergoes isomerization to produce a more stable structural isomer.
+• Example (Historical/Fundamental): Wöhler's synthesis of urea from ammonium cyanate.
+$$\text{NH}_4\text{CNO} \xrightarrow{\Delta} \text{H}_2\text{N-CO-NH}_2$$
+
+Core Summary Table
+Reaction Category	Primary Level	Key Identifying Feature
+Combination	SSC	Multiple reactants $\rightarrow$ 1 Product
+Decomposition	SSC	1 Reactant $\rightarrow$ Multiple products ($\Delta$, $h\nu$, or $e^-$)
+Single Displacement	SSC	Element + Salt $\rightarrow$ New Salt + Free Element
+Double Displacement	SSC	Ion exchange between two ionic partners
+Combustion	SSC	Fuel + $\text{O}_2 \rightarrow \text{CO}_2 + \text{H}_2\text{O} + \text{Heat}$
+Acid-Base	HSC	Proton ($H^+$) transfer; yields salt and water
+Precipitation	HSC	$\text{aq} + \text{aq} \rightarrow \text{solid}\downarrow$
+Redox	HSC	Shift in oxidation numbers; electron exchange
+Complex Formation	Honours	Ligand donation to transition metal ion
+Organic Reactions	Honours	Regulated by $S_N, E, A_E$ molecular mechanisms

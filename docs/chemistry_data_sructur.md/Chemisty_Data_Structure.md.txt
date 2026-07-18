@@ -1,0 +1,162 @@
+# Chemistry Knowledge Structure & Database Design
+### For an SSC / HSC / Honours 1st Year Chemistry Learning App
+
+---
+
+## 1. Conceptual Hierarchy
+
+The knowledge base is organized as a **layered taxonomy** with **cross-cutting entity links**. Two things exist side by side:
+
+- **Curriculum hierarchy** (how a student navigates: Level → Subject → Chapter → Concept)
+- **Domain entities** (Reactions, Compounds, Elements, Experiments, Equations) that are *shared resources*, referenced from many chapters/concepts rather than owned by just one.
+
+```
+Level (SSC / HSC / Honours 1st Year)
+ └── Subject (Chemistry 1st Paper, Chemistry 2nd Paper, etc.)
+      └── Chapter (e.g., "Periodic Table", "Chemical Bonding", "Organic Chemistry")
+           └── Concept (e.g., "Electronegativity", "SN1 vs SN2")
+                ├── linked → Elements
+                ├── linked → Compounds
+                ├── linked → Reactions
+                ├── linked → Equations
+                └── linked → Experiments
+```
+
+**Why two structures instead of one deep tree?**
+A single tree forces duplication — e.g., "NaOH" or "Le Chatelier's Principle" would need to be copied into every chapter that mentions it (SSC acid-base, HSC equilibrium, Honours physical chemistry). Instead:
+
+- Curriculum nodes (Level/Subject/Chapter/Concept) form the **navigation tree**.
+- Domain entities (Element/Compound/Reaction/Equation/Experiment) are **standalone records**, connected to concepts via **many-to-many linking tables**.
+
+This means one compound (say, H₂SO₄) can appear under SSC "Acids and Bases," HSC "Industrial Chemistry," and Honours "Inorganic Chemistry" — without duplicating its data.
+
+---
+
+## 2. Entity Definitions
+
+| Entity | Purpose | Key Attributes |
+|---|---|---|
+| **Level** | Academic stage | name (SSC/HSC/Honours 1st Year), curriculum_board, sequence_order |
+| **Subject** | A paper/course within a level | name, code, level_id, description |
+| **Chapter** | A unit within a subject | title, subject_id, sequence_order, syllabus_ref |
+| **Concept** | An explainable idea/topic | title, chapter_id, difficulty, summary, full_content (markdown/HTML), prerequisite_concept_ids |
+| **Element** | Periodic table entry | symbol, atomic_number, atomic_mass, group, period, block, electron_config, category (metal/non-metal/metalloid), properties (JSON) |
+| **Compound** | Chemical substance | name, formula, IUPAC_name, molar_mass, type (organic/inorganic), state, bonding_type, structure_image_url, properties (JSON) |
+| **Reaction** | A chemical transformation | name, type (redox/acid-base/addition/substitution/etc.), reactant_compound_ids, product_compound_ids, mechanism_text, conditions (catalyst/temp/pressure) |
+| **Equation** (Important Equations) | Mathematical/chemical formula students must memorize | title (e.g., "Ideal Gas Law", "Nernst Equation"), formula_latex, variables (JSON: symbol → meaning/unit), derivation_text, applicable_concept_ids |
+| **Experiment** | Lab procedure | title, objective, apparatus (JSON list), procedure_steps (ordered list), observations, precautions, related_concept_ids, related_reaction_ids |
+
+---
+
+## 3. Relationships
+
+- **Level → Subject**: one-to-many (a level has multiple subjects/papers)
+- **Subject → Chapter**: one-to-many
+- **Chapter → Concept**: one-to-many
+- **Concept ↔ Concept**: many-to-many (self-referencing, for prerequisites — e.g., "Bonding" is a prerequisite for "Molecular Geometry")
+- **Concept ↔ Element**: many-to-many
+- **Concept ↔ Compound**: many-to-many
+- **Concept ↔ Reaction**: many-to-many
+- **Concept ↔ Equation**: many-to-many
+- **Concept ↔ Experiment**: many-to-many
+- **Reaction ↔ Compound**: many-to-many, but **role-qualified** (a compound can be a *reactant* in one reaction and a *product* in another — this needs a role field, not a plain junction)
+- **Reaction ↔ Element**: many-to-many (for reactions involving elemental forms, e.g., Na + Cl₂)
+- **Experiment ↔ Reaction**: many-to-many (an experiment often demonstrates a specific reaction)
+- **Experiment ↔ Compound**: many-to-many (chemicals/apparatus used)
+
+The recurring pattern: **curriculum entities own nothing directly except structure; domain entities are the reusable substance, joined in through link tables.**
+
+---
+
+## 4. Recommended Database: Relational (PostgreSQL or MySQL)
+
+**Why relational over NoSQL:**
+- The data is inherently structured with fixed, well-known relationships (hierarchies + many-to-many links) — a textbook use case for a relational schema.
+- Strong need for referential integrity: a Concept referencing a deleted Compound should be prevented or cascaded properly — foreign keys handle this natively.
+- Complex queries are common ("show all Compounds used in Reactions tagged under HSC Chapter 4") — SQL joins handle this cleanly; NoSQL would require denormalization or app-side joins.
+- Content payloads (explanations, steps, LaTeX) can still be stored as JSON/JSONB columns within a relational table — giving flexibility without giving up integrity (PostgreSQL's JSONB is ideal here).
+
+**Mobile-side pairing:** Use SQLite (via Room on Android / GRDB on iOS, or a cross-platform ORM like Drift/WatermelonDB if using Flutter/React Native) as a **local mirror** of the same schema, synced from the PostgreSQL backend. This gives offline access — essential for students with unreliable connectivity — while keeping a single source of truth on the server.
+
+### Core Tables
+
+```sql
+-- Curriculum hierarchy
+levels(id PK, name, board, sequence_order)
+subjects(id PK, level_id FK, name, code, description)
+chapters(id PK, subject_id FK, title, sequence_order, syllabus_ref)
+concepts(id PK, chapter_id FK, title, difficulty, summary, content, sequence_order)
+
+-- Self-referencing prerequisite graph
+concept_prerequisites(concept_id FK, prerequisite_id FK, PRIMARY KEY(concept_id, prerequisite_id))
+
+-- Domain entities
+elements(id PK, symbol, name, atomic_number, atomic_mass, group_num, period, block,
+         electron_config, category, properties JSONB)
+
+compounds(id PK, name, formula, iupac_name, molar_mass, compound_type, state,
+          bonding_type, structure_image_url, properties JSONB)
+
+reactions(id PK, name, reaction_type, mechanism_text, conditions JSONB)
+
+equations(id PK, title, formula_latex, variables JSONB, derivation_text)
+
+experiments(id PK, title, objective, apparatus JSONB, procedure_steps JSONB,
+            observations, precautions)
+
+-- Many-to-many link tables
+concept_elements(concept_id FK, element_id FK, PRIMARY KEY(concept_id, element_id))
+concept_compounds(concept_id FK, compound_id FK, PRIMARY KEY(concept_id, compound_id))
+concept_reactions(concept_id FK, reaction_id FK, PRIMARY KEY(concept_id, reaction_id))
+concept_equations(concept_id FK, equation_id FK, PRIMARY KEY(concept_id, equation_id))
+concept_experiments(concept_id FK, experiment_id FK, PRIMARY KEY(concept_id, experiment_id))
+
+-- Role-qualified reaction participants (reactant vs product vs catalyst)
+reaction_compounds(reaction_id FK, compound_id FK, role ENUM('reactant','product','catalyst'),
+                   stoichiometric_coefficient INT, PRIMARY KEY(reaction_id, compound_id, role))
+
+reaction_elements(reaction_id FK, element_id FK, role ENUM('reactant','product','catalyst'),
+                  stoichiometric_coefficient INT, PRIMARY KEY(reaction_id, element_id, role))
+
+experiment_reactions(experiment_id FK, reaction_id FK, PRIMARY KEY(experiment_id, reaction_id))
+experiment_compounds(experiment_id FK, compound_id FK, usage_note, PRIMARY KEY(experiment_id, compound_id))
+```
+
+### Indexing recommendations
+- Index `formula` on `compounds` and `symbol`/`atomic_number` on `elements` (frequent lookups).
+- Composite indexes on all junction tables' FK pairs (already covered by composite PKs above).
+- Full-text search index (PostgreSQL `tsvector`) on `concepts.content` and `experiments.procedure_steps` for in-app search.
+- GIN index on JSONB `properties` columns if you'll query inside them (e.g., "find all compounds where state = 'gas'").
+
+---
+
+## 5. Example: How One Compound Flows Through the Structure
+
+**Sulfuric Acid (H₂SO₄)** — stored once in `compounds`.
+
+- Linked to **Concept**: "Acids, Bases and Salts" (SSC Chemistry), "Industrial Chemical Processes" (HSC), "Sulfur Oxo-acids" (Honours) — three rows in `concept_compounds`, zero duplication of the compound record.
+- Linked to **Reaction**: "Contact Process" (`reaction_compounds` role = product) and "Neutralization with NaOH" (role = reactant).
+- Linked to **Equation**: none directly, but the Contact Process reaction links to the **equilibrium constant equation** via `concept_equations` at the chapter level.
+- Linked to **Experiment**: "Preparation of Sulfuric Acid — Contact Process demonstration."
+
+A single UPDATE to the compound's `molar_mass` or `properties` propagates everywhere it's referenced — no sync issues across grade levels.
+
+---
+
+## 6. App-Layer Recommendations
+
+- **Search/filter layer**: Build a unified search index (e.g., via PostgreSQL full-text search or an external index like Meilisearch/Typesense) across concepts, compounds, reactions, and equations — students often search by name without knowing which entity type it belongs to.
+- **Versioning**: Add `updated_at` and a lightweight `content_version` integer per entity so the mobile app can do incremental sync (pull only changed rows) rather than full re-downloads.
+- **Media**: Store diagrams/structures/lab images in object storage (S3-compatible), keep only URLs in the DB.
+- **Difficulty/level tagging**: Since the same Concept/Compound can be relevant at multiple levels, keep the `concept_*` junction as the source of "which level this appears in" rather than hardcoding level onto the Compound/Element/Reaction record itself.
+- **Practice questions** (if added later): model as a new entity `questions` linked to `concepts` (many-to-many) rather than embedding into content fields — keeps quizzing decoupled from explanatory content.
+
+---
+
+## 7. Summary of the Design Philosophy
+
+1. **Navigation tree** (Level→Subject→Chapter→Concept) answers "where does a student find this?"
+2. **Domain entities** (Element, Compound, Reaction, Equation, Experiment) answer "what is this, independent of where it's taught?"
+3. **Junction tables** answer "where does this apply, and in what role?"
+
+This keeps the data normalized (no duplication), scalable (adding Honours 2nd/3rd/4th year later is just new Level/Subject/Chapter rows, no schema change), and query-friendly (any "show me everything related to X across all levels" question is a straightforward join).

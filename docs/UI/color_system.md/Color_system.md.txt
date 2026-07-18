@@ -1,0 +1,160 @@
+﻿## 🎨 Color Palette (Professional Educational Theme)
+
+The color palette is built around deep, academic blues and teals, balanced with crisp, clean backgrounds to establish credibility, minimize eye strain, and keep the focus on complex educational content.
+
+### Primary Colors
+
+* **Primary Deep Blue:** `#1A365D` (Used for headers, key brand elements, and primary navigation)
+* **Primary Slate:** `#2D3748` (Used for primary body text, titles, and structural hierarchy)
+
+### Secondary Colors
+
+* **Secondary Teal:** `#2B6CB0` (Used for highlights, secondary interactive elements, and subheadings)
+* **Secondary Pale Blue:** `#EBF8FF` (Used for card backgrounds, alert banners, and soft section fills)
+
+### Accent Colors
+
+* **Cyan Accent:** `#3182CE` (Used for active states, focal points, interactive icons, and highlight badges)
+* **Amber Gold:** `#D69E2E` (Used sparingly for Achievements, Premium features, or "Daily Streak" indicators)
+
+### System Colors (Status & Feedback)
+
+* **Success Colors:**
+* *Success Green:* `#38A169` (For correct answers, completed tasks, and safe chemical hazard levels)
+* *Success Tint:* `#F0FFF4` (For soft background fills behind success states)
+
+* **Error Colors:**
+* *Error Red:* `#E53E3E` (For incorrect quiz answers, critical system errors, or hazardous chemical warnings)
+* *Error Tint:* `#FFF5F5` (For soft background fills behind error states)
+
+* **Warning Colors:**
+* *Warning Orange:* `#DD6B20` (For warnings, incomplete steps, or moderate toxicity alerts)
+
+---
+
+## 📐 Spacing & Grid System
+
+To maintain visual consistency and rhythm across various screen sizes, we use an **8pt Grid System**. All margins, paddings, and element heights should be divisible by 8.
+
+| Token | Value | Applied To |
+| --- | --- | --- |
+| `space-xs` | **4px** | Tight groupings, icon-to-text spacing |
+| `space-sm` | **8px** | Padding inside small components, item-to-item spacing in list items |
+| `space-md` | **16px** | Standard screen margins (sides), padding inside standard cards |
+| `space-lg` | **24px** | Vertical spacing between distinct sections or large UI blocks |
+| `space-xl` | **32px** | Top/bottom margins of hero areas or header-to-content spacing |
+
+---
+
+## 🪄 Typography & Font Scale
+
+* **Primary Typeface:** *Inter* or *Segoe UI* (Highly legible on mobile screens for technical nomenclature, chemical formulas, and equations).
+* **Technical / Code Typeface:** *JetBrains Mono* or *Fira Code* (For raw chemical strings like SMILES, formulas, or step-by-step algorithms).
+
+| Style | Weight | Size / Line Height | Usage |
+| --- | --- | --- | --- |
+| **Display Heading** | Bold (700) | 24sp / 32sp | Main screen titles (e.g., "Dashboard") |
+| **Section Heading** | Semi-Bold (600) | 18sp / 24sp | Sub-sections, card titles |
+| **Body Text (Primary)** | Regular (400) | 14sp / 20sp | Main descriptions, paragraphs, reading material |
+| **Body Text (Secondary)** | Regular (400) | 12sp / 16sp | Meta-text, captions, helper text |
+| **Technical Text** | Medium (500) | 13sp / 18sp | Formulas ($H_2O$), mathematical steps, inputs |
+
+---
+
+## 🔲 Border Radius
+
+Smooth, moderate curves prevent the app from feeling overly rigid or sterile while maintaining a professional, software-like environment.
+
+* **Small (`4px`):** Used for input fields, checkboxes, tooltips, and small badges.
+* **Medium (`8px`):** Used for primary buttons, system status boxes, and list items.
+* **Large (`12px` - `16px`):** Used for main cards, modular containers, bottom sheets, and dialog popups.
+
+---
+
+## 🃏 Card Style
+
+Cards act as the primary content containers on dashboards and lists.
+
+### Light Mode Card
+
+* **Background:** `#FFFFFF`
+* **Border:** `1px` solid `#E2E8F0`
+* **Shadow:** `0px 4px 6px -1px rgba(0, 0, 0, 0.05), 0px 2px 4px -1px rgba(0, 0, 0, 0.03)`
+* **Padding:** `16px` (`space-md`)
+* **Border Radius:** `12px`
+
+### Dark Mode Card
+
+* **Background:** `#1E293B`
+* **Border:** `1px` solid `#334155`
+* **Shadow:** No shadow needed (rely on border contrasting to establish elevation)
+* **Padding:** `16px` (`space-md`)
+* **Border Radius:** `12px`
+
+---
+
+## 🔘 Button Style
+
+Buttons must have distinct visual states to ensure interactive elements are clear at a glance.
+
+### 1. Primary Solid Button
+
+* **Style:** Filled with Primary Teal (`#2B6CB0`), text in White (`#FFFFFF`). Bold (600).
+* **Corner Radius:** `8px`
+* **Tap Target:** Minimum `48px` height (iOS/Android accessibility standard).
+* **States:**
+* *Default:* `#2B6CB0`
+* *Pressed/Active:* `#1A365D`
+* *Disabled:* Background `#E2E8F0`, Text `#A0AEC0`
+
+### 2. Secondary Outline Button
+
+* **Style:** No fill background. Border `1.5px` solid Primary Teal (`#2B6CB0`), text in `#2B6CB0`.
+* **Corner Radius:** `8px`
+* **States:**
+* *Default:* Transparent background, `#2B6CB0` border.
+* *Pressed:* Light blue tint fill (`#EBF8FF`), `#2B6CB0` border.
+
+---
+
+## 📥 Input Fields
+
+Vital for chemistry tools requiring formula inputs, search criteria, or text values.
+
+```
+┌──────────────────────────────────────────────┐
+│  🔍  Search elements or enter formula...     │
+└──────────────────────────────────────────────┘
+
+```
+
+* **Height:** `48px` (comfortably tapable on mobile)
+* **Background:** `#F7FAFC` (Light Mode) | `#1E293B` (Dark Mode)
+* **Border:** `1px` solid `#E2E8F0` (Changes to `#3182CE` / Cyan Accent on active focus).
+* **Placeholder Text Color:** `#A0AEC0`
+* **Typography:** Technical font style (to ensure standard characters, subscript, and superscript align beautifully).
+
+---
+
+## 🌓 Theme Switch (Light vs. Dark Mode)
+
+The UI must adapt seamlessly between daytime studying/work and late-night lab sessions to prevent ocular fatigue.
+
+### Light Mode
+
+Optimized for high readability in well-lit environments (e.g., classrooms, bright labs).
+
+* **App Background:** `#F7F9FC`
+* **Surface/Container Background:** `#FFFFFF`
+* **Primary Text:** `#2D3748` (Slate)
+* **Secondary Text:** `#718096`
+
+### Dark Mode
+
+Optimized for late-night study sessions and low-light laboratory settings.
+
+* **App Background:** `#0F172A` (Deep Slate-Black)
+* **Surface/Container Background:** `#1E293B` (Dark Blue-Gray)
+* **Primary Text:** `#F8FAFC` (Off-white)
+* **Secondary Text:** `#94A3B8` (Soft Slate Gray)
+* **Accent Color Adjustment:** Accent elements increase slightly in brightness (e.g., Cyan `#63B3ED`) to maintain high legibility against pitch-dark backdrops.

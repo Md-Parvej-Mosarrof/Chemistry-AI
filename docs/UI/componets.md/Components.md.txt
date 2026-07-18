@@ -1,0 +1,183 @@
+﻿This UI Component Library is designed to accompany the modern, scientific, and trustworthy Chemistry AI application. Developed in alignment with our 8pt Grid System and bilingual typography rules (Inter + Hind Siliguri), these components guarantee visual consistency, accessible tap targets, and high-quality technical presentation across both Light and Dark modes.
+🛠️ Global Component Specifications
+• Tap Targets: Any interactive component (buttons, switches, tab items) must maintain a minimum bounding box of $48\text{ dp} \times 48\text{ dp}$ for physical accessibility.
+
+• Dividers: $1\text{ dp}$ width, colored #E2E8F0 (Light Mode) or #1E293B (Dark Mode).
+
+🔘 Core Interactive Components
+1. Buttons
+
+  ┌───────────────────────────┐      ┌───────────────────────────┐
+  │      Solve Reaction       │      │      Solve Reaction       │ (Pressed / Focus)
+  └───────────────────────────┘      └───────────────────────────┘
+
+• Primary Action Button:
+  • Design: Filled #008080 (Teal), text in #FFFFFF (Inter Bold, $14\text{ sp}$). Height $48\text{ dp}$. Border Radius $8\text{ dp}$.
+
+  • States: Active (#008080), Pressed (#0F1E36), Disabled (Background #E2E8F0, Text #A0AEC0).
+
+• Secondary Outline Button:
+  • Design: No fill. Border $1.5\text{ dp}$ solid #008080. Text #008080 (Inter Semi-Bold). Border Radius $8\text{ dp}$.
+
+  • States: Active (Transparent), Pressed (Filled with light tint #E6FFFA), Disabled (Border & Text #E2E8F0).
+
+• Ghost / Icon Button:
+  • Design: Transparent background. Circular tap area ($48\text{ dp}$). Centered icon in #2D3748 or #008080.
+
+2. Input Fields & Search Bar
+• Standard Input Field:
+  • Structure: Floating label, icon prefix (optional), input canvas, status/helper text.
+
+  • Styling: Height $52\text{ dp}$. Background #F4F7F6 (Light) or #121B2D (Dark). Border $1\text{ dp}$ solid #E2E8F0 (Active Focus: #00E5FF).
+
+• Search Bar:
+  • Visual Mockup:
+
+┌─────────────────────────────────────────────────────────┐
+│  🔍  Search reactions, elements, or formulas...      🎙️ │
+└─────────────────────────────────────────────────────────┘
+
+  • Specs: Height $48\text{ dp}$. Border Radius $24\text{ dp}$ (fully rounded pills). Right-aligned voice/OCR camera trigger icon. Placeholder text in #A0AEC0.
+
+🏛️ Structural & Layout Components
+3. Cards (Base Grid)
+• Standard Container Card:
+  • Light Mode: Background #FFFFFF, Border $1\text{ dp}$ solid #E2E8F0, Shadow 0px 4px 6px -1px rgba(0,0,0,0.05), Border Radius $12\text{ dp}$, Padding $16\text{ dp}$ (space-md).
+
+  • Dark Mode: Background #121B2D, Border $1\text{ dp}$ solid #1E293B (No shadow).
+
+4. Dialogs (Modals)
+• Alert & Confirmation Dialog:
+  • Layout: Semitransparent scrim/backdrop (rgba(15, 30, 54, 0.6)) hosting a centered modal sheet.
+
+  • Dimensions: Width: $85\%$ of screen. Border Radius $16\text{ dp}$.
+
+  • Components:
+  1. Title: Section Heading ($18\text{ sp}$, Bold, #0F1E36).
+
+  2. Body: Description text ($14\text{ sp}$, Regular, #2D3748).
+
+  3. Actions: Stacked or side-by-side buttons (Cancel on left/bottom, Affirmative on right/top).
+
+5. Bottom Sheet
+• Action Sheet Drawer:
+  • Layout: Slide-up container anchored to the bottom of the viewport.
+
+  • Details: Top-centered pill handle ($36\text{ dp} \times 4\text{ dp}$, color #E2E8F0 for dragging down). Max height: $80\%$ of screen.
+
+  • Typography: Section Heading title ($18\text{ sp}$, Semi-Bold) with a list of action items underneath ($15\text{ sp}$, Medium, each with a leading icon).
+
+6. Navigation Bar
+• Bottom Navigation Bar (App Shell):
+  • Dimensions: Height $64\text{ dp}$ at the bottom of the screen.
+
+  • Structure: 4 or 5 key destinations (Dashboard, Formula Solver, Periodic Table, Saved Notes).
+
+  • Interactive Specs: Unselected icon (#718096, $11\text{ sp}$ text label); Selected icon (#008080, $11\text{ sp}$ bold label). Active indicator: A soft teal dot underneath the active icon.
+
+🧪 Chemistry-Specific Components
+7. Chemical Formula Widget
+This card displays chemical formulas with mathematically optimized subscripts.
+
+┌────────────────────────────────────────────────────────┐
+│  ETHANOL                                               │
+│  C₂H₅OH                                        [ 3D ]  │
+│  Molar Mass: 46.07 g/mol                               │
+└────────────────────────────────────────────────────────┘
+
+• Styling: Left-bordered accent bar ($4\text{ dp}$ thick, colored #008080).
+
+• Typography: Formula rendered in JetBrains Mono ($18\text{ sp}$, Bold, #0F1E36). Subscripts must programmatically use standard Unicode subscripts or LaTeX styling to prevent visual alignment issues.
+
+• Interactive Call-to-Action: Right-aligned quick-action chip to launch the 3D Molecular Builder screen.
+
+8. Reaction Card
+• Purpose: Summarizes chemical equations with reactants, catalysts, and products.
+
+• Visual Layout:
+
+┌────────────────────────────────────────────────────────┐
+│  Combustion of Methane                                 │
+│                                                        │
+│  CH₄  +  2 O₂   ─────────────►   CO₂  +  2 H₂O         │
+│                     [ Heat ]                           │
+└────────────────────────────────────────────────────────┘
+
+• Styling: Monospace equation text ($14\text{ sp}$). Catalyst values placed perfectly centered above/below the transition arrow.
+
+🎓 Educational & Gamified Components
+9. Quiz Card
+Interactive multiple-choice option buttons designed for instant visual feedback.
+
+┌────────────────────────────────────────────────────────┐
+│  What is the oxidation state of sulfur in H₂SO₄?       │
+│                                                        │
+│  (A) +4                                                │
+│  [B] +6  (Correct ✔)                                   │
+│  (C) -2                                                │
+└────────────────────────────────────────────────────────┘
+
+• States:
+  • Default Option: White background, gray border, dark text.
+
+  • Correct Option: #F0FFF4 background, #10B981 border, green text, trailing check icon.
+
+  • Incorrect Option: #FFF5F5 background, #EF4444 border, red text, trailing cross icon.
+
+10. Progress Bar
+Tracks student study paths or course completion metrics.
+• Style: Track background #E2E8F0, height $8\text{ dp}$, rounded caps (Radius $4\text{ dp}$).
+
+• Indicator: Filled track with #00E5FF (Atomic Cyan) or #008080 (Teal) transitioning based on percent complete.
+
+💬 AI & Personalization Components
+11. AI Chat Bubble
+• User Bubble:
+  • Design: Aligned right. Filled with Secondary Teal (#008080), text in White (#FFFFFF). Border Radius $16\text{ dp}$ (bottom-right corner sharp).
+
+• AI Bubble:
+  • Design: Aligned left. Filled with Soft Ether Blue (#E6FFFA), text in Navy (#0F1E36). Border Radius $16\text{ dp}$ (bottom-left corner sharp). Left border has a $2\text{ dp}$ Cyan Accent indicator (#00E5FF).
+
+12. Language Switch
+• Style: Pill-shaped toggle switch ($40\text{ dp}$ height, $90\text{ dp}$ width).
+
+• Interactive Behavior: Sliding active pill that transitions between EN (Inter) and বাং (Hind Siliguri).
+
+• Colors: Slide background #F4F7F6, active thumb #008080, active text #FFFFFF.
+
+13. Profile Card
+• Purpose: Highlighting personal achievements and active learning status.
+
+• Visual Layout:
+
+┌────────────────────────────────────────────────────────┐
+│  👤 Md. Parvez Mosharraf                               │
+│  Class: HSC 26 | Rank: Diamond Elite                   │
+│  🏆 12 Day Streak                                      │
+└────────────────────────────────────────────────────────┘
+
+• Specs: Standard Container Card format. Prominent profile avatar placeholder. Uses Amber Gold (#FFB300) for trophy icons and high-tier rank badges.
+
+⚠️ System Status Components
+14. Loading Indicators
+• Circular Progress: Spin animation on an open circle using #008080 (Teal) with a 3px stroke width.
+
+• Skeleton Loader: Soft gray blocks (#E2E8F0) with a pulsating gradient opacity animation (ranging from $0.4$ to $1.0$ opacity every $1.5\text{ seconds}$).
+
+15. Error Screen (Full View)
+• Illustration: Centered, chemically themed hazard vector (e.g., broken test tube) in #EF4444.
+
+• Error Title: "Reaction Failed to Load" ($18\text{ sp}$, Bold).
+
+• Helper Text: "Check your internet connection or try re-typing the chemical formula." ($14\text{ sp}$, Regular, Slate).
+
+• Action Button: Primary button styled as "Try Again" (#008080).
+
+16. Empty Screen (Full View)
+• Illustration: A clean, minimal scientific magnifying glass or blank lab notebook vector in #A0AEC0.
+
+• Title: "No Saved Equations" ($18\text{ sp}$, Semi-Bold).
+
+• Subtext: "Formulas and 3D molecular models you save will appear right here." ($14\text{ sp}$, Regular).
+
+• CTA Button: Secondary outline button styled as "Scan First Formula".
