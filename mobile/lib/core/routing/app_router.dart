@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../features/home/presentation/pages/home_page.dart';
 
 // Routes paths
 class RoutePaths {
@@ -19,11 +20,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.home,
         name: 'home',
         builder: (context, state) {
-          // TODO: Implement home screen
-          return Scaffold(
-            appBar: AppBar(title: const Text('Chemistry Learning')),
-            body: const Center(child: Text('Home Screen')),
-          );
+          return const HomePage();
         },
       ),
       GoRoute(
@@ -60,14 +57,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-   errorBuilder: (context, state) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Error'),
-    ),
-    body: const Center(
-      child: Text('Page not found'),
-    ),
+    errorBuilder: (context, state) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Error'),
+        ),
+        body: const Center(
+          child: Text('Page not found'),
+        ),
+      );
+    },
   );
-}, );
 });
