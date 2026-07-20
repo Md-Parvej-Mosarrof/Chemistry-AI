@@ -9,10 +9,12 @@ extension BuildContextExtension on BuildContext {
   double get screenHeight => MediaQuery.of(this).size.height;
 
   /// Check if device is in portrait mode
-  bool get isPortrait => MediaQuery.of(this).orientation == Orientation.portrait;
+  bool get isPortrait =>
+      MediaQuery.of(this).orientation == Orientation.portrait;
 
   /// Check if device is in landscape mode
-  bool get isLandscape => MediaQuery.of(this).orientation == Orientation.landscape;
+  bool get isLandscape =>
+      MediaQuery.of(this).orientation == Orientation.landscape;
 
   /// Check if device is mobile (width < 600)
   bool get isMobile => screenWidth < 600;
@@ -27,7 +29,8 @@ extension BuildContextExtension on BuildContext {
   EdgeInsets get viewInsets => MediaQuery.of(this).viewInsets;
 
   /// Show a snackbar
-  void showSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
+  void showSnackBar(String message,
+      {Duration duration = const Duration(seconds: 2)}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -40,7 +43,8 @@ extension BuildContextExtension on BuildContext {
 /// Extension methods for String
 extension StringExtension on String {
   /// Capitalize first letter
-  String get capitalize => isEmpty ? this : this[0].toUpperCase() + substring(1);
+  String get capitalize =>
+      isEmpty ? this : this[0].toUpperCase() + substring(1);
 
   /// Check if email is valid
   bool get isValidEmail {
@@ -83,7 +87,9 @@ extension DateTimeExtension on DateTime {
   /// Check if date is yesterday
   bool get isYesterday {
     final yesterday = DateTime.now().subtract(Duration(days: 1));
-    return year == yesterday.year && month == yesterday.month && day == yesterday.day;
+    return year == yesterday.year &&
+        month == yesterday.month &&
+        day == yesterday.day;
   }
 }
 

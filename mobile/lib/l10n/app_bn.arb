@@ -1,0 +1,15 @@
+{
+  "@@locale": "bn",
+
+  "appName": "কেমিস্ট্রি এআই",
+  "welcomeMessage": "কেমিস্ট্রি এআই-এ স্বাগতম",
+  "searchHint": "অধ্যায় খুঁজুন...",
+  "categories": "বিষয়সমূহ",
+  "featuredChapters": "জনপ্রিয় অধ্যায়",
+  "continueLearning": "পড়াশোনা চালিয়ে যান",
+
+  "home": "হোম",
+  "search": "সার্চ",
+  "favorites": "পছন্দ",
+  "profile": "প্রোফাইল"
+}

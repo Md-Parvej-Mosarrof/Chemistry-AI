@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+
+  "appName": "Chemistry AI",
+  "welcomeMessage": "Welcome to Chemistry AI",
+  "searchHint": "Search chapters...",
+  "categories": "Categories",
+  "featuredChapters": "Featured Chapters",
+  "continueLearning": "Continue Learning",
+
+  "home": "Home",
+  "search": "Search",
+  "favorites": "Favorites",
+  "profile": "Profile"
+}

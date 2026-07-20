@@ -2,16 +2,16 @@
 class AppConstants {
   /// Base API URL for backend connection
   static const String baseUrl = 'http://localhost:8000/api/v1';
-  
+
   /// Request timeout in seconds
   static const int requestTimeout = 30;
-  
+
   /// Cache duration in days
   static const int cacheDurationDays = 7;
-  
+
   /// App name
   static const String appName = 'Chemistry Learning';
-  
+
   /// App version
   static const String appVersion = '1.0.0';
 
