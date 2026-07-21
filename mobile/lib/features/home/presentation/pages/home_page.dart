@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../widgets/home_app_bar.dart';
-import '../widgets/home_search_box.dart';
-import '../widgets/home_category_grid.dart';
-import '../widgets/home_featured_chapters.dart';
-import '../widgets/home_continue_learning.dart';
-import '../widgets/home_bottom_navigation.dart';
+
 import '../../../../l10n/app_localizations.dart';
+import '../widgets/home_app_bar.dart';
+import '../widgets/home_bottom_navigation.dart';
+import '../widgets/home_category_grid.dart';
+import '../widgets/home_continue_learning.dart';
+import '../widgets/home_featured_chapters.dart';
+import '../widgets/home_search_box.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,14 +31,13 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-
-             Text(
-        AppLocalizations.of(context)!.welcomeMessage,
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+            Text(
+              AppLocalizations.of(context)!.welcomeMessage,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 16),
             const HomeSearchBox(),
             const SizedBox(height: 24),
