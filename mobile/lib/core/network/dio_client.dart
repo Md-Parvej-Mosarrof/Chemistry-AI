@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
+import 'network_exception.dart';
 
 /// Dio HTTP client provider
 final dioProvider = Provider<Dio>((ref) {
@@ -62,6 +63,10 @@ class _ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // Handle specific error cases if needed
-    super.onError(err, handler);
+     final exception = NetworkException.fromDioException(err);
+
+    print('Network Error: ${exception.message}');
+
+    handler.next(err);
   }
 }
