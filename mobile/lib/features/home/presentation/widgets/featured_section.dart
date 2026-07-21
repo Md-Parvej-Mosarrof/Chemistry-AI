@@ -45,7 +45,7 @@ class FeaturedSection extends StatelessWidget {
               SizedBox(width: 12),
               ChapterCard(
                 title: 'Atomic Structure',
-                icon: Icons.atom,
+                icon: Icons.science,
                 isHorizontal: true,
               ),
             ],

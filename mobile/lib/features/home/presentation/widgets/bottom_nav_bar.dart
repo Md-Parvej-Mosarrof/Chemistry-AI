@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/routing/app_router.dart';
+
+import '../../../../core/routing/app_router.dart';
 
 class BottomNavBar extends ConsumerWidget {
   final int currentIndex;
@@ -9,7 +11,6 @@ class BottomNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.read(appRouterProvider);
 
     return NavigationBar(
       selectedIndex: currentIndex,
@@ -55,4 +56,3 @@ class BottomNavBar extends ConsumerWidget {
   }
 }
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
