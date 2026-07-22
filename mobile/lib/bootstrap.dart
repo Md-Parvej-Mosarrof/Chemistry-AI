@@ -13,11 +13,7 @@ Future<void> bootstrap() async {
   // Initialize any required services here
   // e.g., HiveDB, SharedPreferences, Firebase, etc.
 
-  runApp(
-    const ProviderScope(
-      child: ChemistryLearningApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: ChemistryLearningApp()));
 }
 
 class ChemistryLearningApp extends ConsumerWidget {

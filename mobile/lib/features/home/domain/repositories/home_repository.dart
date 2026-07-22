@@ -1,6 +1,5 @@
-// Home repository abstract interface
-// TODO: Define abstract repository interface
-// Example:
-// abstract class HomeRepository {
-//   Future<List<HomeEntity>> getHomeData();
-// }
+import '../entities/home_entity.dart';
+
+abstract class HomeRepository {
+  Future<List<HomeEntity>> getHomeData();
+}

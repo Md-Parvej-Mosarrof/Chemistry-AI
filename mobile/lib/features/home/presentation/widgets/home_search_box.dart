@@ -10,9 +10,7 @@ class HomeSearchBox extends StatelessWidget {
       leading: const Icon(Icons.search),
       elevation: const WidgetStatePropertyAll(0),
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       onTap: () {},
       onChanged: (_) {},

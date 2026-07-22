@@ -29,9 +29,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -39,9 +37,7 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 2,
           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTextStyles.title2.copyWith(color: Colors.white),
         ),
       ),
@@ -50,9 +46,7 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           side: BorderSide(color: AppColors.primary),
           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: AppTextStyles.title2.copyWith(color: AppColors.primary),
         ),
       ),
@@ -89,25 +83,33 @@ class AppTheme {
         hintStyle: AppTextStyles.body2.copyWith(color: AppColors.textTertiary),
       ),
       textTheme: TextTheme(
-        displayLarge:
-            AppTextStyles.headline1.copyWith(color: AppColors.textPrimary),
-        displayMedium:
-            AppTextStyles.headline2.copyWith(color: AppColors.textPrimary),
-        displaySmall:
-            AppTextStyles.headline3.copyWith(color: AppColors.textPrimary),
-        headlineSmall:
-            AppTextStyles.title1.copyWith(color: AppColors.textPrimary),
+        displayLarge: AppTextStyles.headline1.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        displayMedium: AppTextStyles.headline2.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        displaySmall: AppTextStyles.headline3.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        headlineSmall: AppTextStyles.title1.copyWith(
+          color: AppColors.textPrimary,
+        ),
         titleLarge: AppTextStyles.title2.copyWith(color: AppColors.textPrimary),
-        titleMedium:
-            AppTextStyles.title3.copyWith(color: AppColors.textPrimary),
+        titleMedium: AppTextStyles.title3.copyWith(
+          color: AppColors.textPrimary,
+        ),
         bodyLarge: AppTextStyles.body1.copyWith(color: AppColors.textPrimary),
-        bodyMedium:
-            AppTextStyles.body2.copyWith(color: AppColors.textSecondary),
-        bodySmall:
-            AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+        bodyMedium: AppTextStyles.body2.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        bodySmall: AppTextStyles.caption.copyWith(
+          color: AppColors.textSecondary,
+        ),
         labelLarge: AppTextStyles.label1.copyWith(color: AppColors.textPrimary),
-        labelSmall:
-            AppTextStyles.label2.copyWith(color: AppColors.textSecondary),
+        labelSmall: AppTextStyles.label2.copyWith(
+          color: AppColors.textSecondary,
+        ),
       ),
       dividerColor: AppColors.divider,
       dividerTheme: DividerThemeData(
@@ -143,33 +145,42 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.darkSurface,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       textTheme: TextTheme(
-        displayLarge:
-            AppTextStyles.headline1.copyWith(color: AppColors.darkTextPrimary),
-        displayMedium:
-            AppTextStyles.headline2.copyWith(color: AppColors.darkTextPrimary),
-        displaySmall:
-            AppTextStyles.headline3.copyWith(color: AppColors.darkTextPrimary),
-        headlineSmall:
-            AppTextStyles.title1.copyWith(color: AppColors.darkTextPrimary),
-        titleLarge:
-            AppTextStyles.title2.copyWith(color: AppColors.darkTextPrimary),
-        titleMedium:
-            AppTextStyles.title3.copyWith(color: AppColors.darkTextPrimary),
-        bodyLarge:
-            AppTextStyles.body1.copyWith(color: AppColors.darkTextPrimary),
-        bodyMedium:
-            AppTextStyles.body2.copyWith(color: AppColors.darkTextSecondary),
-        bodySmall:
-            AppTextStyles.caption.copyWith(color: AppColors.darkTextSecondary),
-        labelLarge:
-            AppTextStyles.label1.copyWith(color: AppColors.darkTextPrimary),
-        labelSmall:
-            AppTextStyles.label2.copyWith(color: AppColors.darkTextSecondary),
+        displayLarge: AppTextStyles.headline1.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        displayMedium: AppTextStyles.headline2.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        displaySmall: AppTextStyles.headline3.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        headlineSmall: AppTextStyles.title1.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        titleLarge: AppTextStyles.title2.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        titleMedium: AppTextStyles.title3.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        bodyLarge: AppTextStyles.body1.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        bodyMedium: AppTextStyles.body2.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
+        bodySmall: AppTextStyles.caption.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
+        labelLarge: AppTextStyles.label1.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        labelSmall: AppTextStyles.label2.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
       ),
     );
   }

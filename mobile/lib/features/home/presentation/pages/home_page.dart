@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/connectivity_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../providers/home_notifier.dart';
 import '../widgets/home_app_bar.dart';
 import '../widgets/home_bottom_navigation.dart';
 import '../widgets/home_category_grid.dart';
 import '../widgets/home_continue_learning.dart';
 import '../widgets/home_featured_chapters.dart';
 import '../widgets/home_search_box.dart';
+import '../../../../core/utils/responsive.dart';
+import '../widgets/featured_section.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -23,6 +26,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final connection = ref.watch(connectivityProvider);
+    final homeState = ref.watch(homeNotifierProvider);
 
     return Scaffold(
       appBar: const PreferredSize(
@@ -35,16 +39,23 @@ class _HomePageState extends ConsumerState<HomePage> {
             return const Center(
               child: Text(
                 'No Internet Connection',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             );
           }
 
+          if (homeState.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (homeState.error != null) {
+            return Center(child: Text(homeState.error!));
+          }
+
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: Responsive.horizontalPadding(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,7 +72,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const SizedBox(height: 24),
                 const HomeCategoryGrid(),
                 const SizedBox(height: 24),
-                const HomeFeaturedChapters(),
+                FeaturedSection(),
                 const SizedBox(height: 24),
                 const HomeContinueLearning(),
                 const SizedBox(height: 32),
@@ -69,12 +80,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => Center(
-          child: Text('Connection Error: $error'),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) =>
+            Center(child: Text('Connection Error: $error')),
       ),
       bottomNavigationBar: HomeBottomNavigation(
         selectedIndex: _selectedNavIndex,

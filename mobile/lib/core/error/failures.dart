@@ -3,10 +3,7 @@ abstract class Failure {
   final String message;
   final String? code;
 
-  Failure({
-    required this.message,
-    this.code,
-  });
+  Failure({required this.message, this.code});
 
   @override
   String toString() => message;
@@ -14,15 +11,12 @@ abstract class Failure {
 
 /// Network failure
 class NetworkFailure extends Failure {
-  NetworkFailure({
-    String message = 'Network error occurred',
-    String? code,
-  }) : super(message: message, code: code);
+  NetworkFailure({String message = 'Network error occurred', String? code})
+    : super(message: message, code: code);
 }
 
 /// Server failure
 class ServerFailure extends Failure {
-  const NetworkFailure(super.message);
   final int? statusCode;
 
   ServerFailure({
@@ -34,32 +28,24 @@ class ServerFailure extends Failure {
 
 /// Cache failure
 class CacheFailure extends Failure {
-  CacheFailure({
-    String message = 'Cache error occurred',
-    String? code,
-  }) : super(message: message, code: code);
+  CacheFailure({String message = 'Cache error occurred', String? code})
+    : super(message: message, code: code);
 }
 
 /// Authentication failure
 class AuthFailure extends Failure {
-  AuthFailure({
-    String message = 'Authentication failed',
-    String? code,
-  }) : super(message: message, code: code);
+  AuthFailure({String message = 'Authentication failed', String? code})
+    : super(message: message, code: code);
 }
 
 /// Validation failure
 class ValidationFailure extends Failure {
-  ValidationFailure({
-    String message = 'Validation failed',
-    String? code,
-  }) : super(message: message, code: code);
+  ValidationFailure({String message = 'Validation failed', String? code})
+    : super(message: message, code: code);
 }
 
 /// Unknown failure
 class UnknownFailure extends Failure {
-  UnknownFailure({
-    String message = 'Unknown error occurred',
-    String? code,
-  }) : super(message: message, code: code);
+  UnknownFailure({String message = 'Unknown error occurred', String? code})
+    : super(message: message, code: code);
 }

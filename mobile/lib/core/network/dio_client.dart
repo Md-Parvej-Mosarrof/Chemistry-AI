@@ -63,7 +63,7 @@ class _ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // Handle specific error cases if needed
-     final exception = NetworkException.fromDioException(err);
+    final exception = NetworkException.fromDioException(err);
 
     print('Network Error: ${exception.message}');
 

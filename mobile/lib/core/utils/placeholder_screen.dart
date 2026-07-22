@@ -5,27 +5,18 @@ class PlaceholderScreen extends StatelessWidget {
   final String screenName;
   final VoidCallback? onRetry;
 
-  const PlaceholderScreen({
-    required this.screenName,
-    this.onRetry,
-    Key? key,
-  }) : super(key: key);
+  const PlaceholderScreen({required this.screenName, this.onRetry, Key? key})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(screenName),
-      ),
+      appBar: AppBar(title: Text(screenName)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.construction,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.construction, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               '$screenName Screen',
@@ -38,10 +29,7 @@ class PlaceholderScreen extends StatelessWidget {
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: onRetry,
-                child: const Text('Retry'),
-              ),
+              ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ],
         ),

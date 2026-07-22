@@ -1,8 +1,12 @@
-// Home use cases
-// TODO: Define use cases for Home Feature
-// Example:
-// class GetHomeDataUseCase {
-//   final HomeRepository repository;
-//   GetHomeDataUseCase(this.repository);
-//   Future<List<HomeEntity>> call() => repository.getHomeData();
-// }
+import '../entities/home_entity.dart';
+import '../repositories/home_repository.dart';
+
+class HomeUseCase {
+  HomeUseCase(this._repository);
+
+  final HomeRepository _repository;
+
+  Future<List<HomeEntity>> call() {
+    return _repository.getHomeData();
+  }
+}

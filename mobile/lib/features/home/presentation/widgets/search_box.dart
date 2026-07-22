@@ -9,10 +9,7 @@ class SearchBox extends StatelessWidget {
       hintText: 'Search chemistry topics...',
       leading: Padding(
         padding: const EdgeInsets.only(left: 16),
-        child: Icon(
-          Icons.search,
-          color: Theme.of(context).colorScheme.outline,
-        ),
+        child: Icon(Icons.search, color: Theme.of(context).colorScheme.outline),
       ),
       elevation: MaterialStateProperty.all(1),
       backgroundColor: MaterialStateProperty.all(
@@ -21,9 +18,7 @@ class SearchBox extends StatelessWidget {
       shape: MaterialStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
+          side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
       ),
     );

@@ -16,10 +16,7 @@ class HomeAppBar extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Good Morning 👋',
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text('Good Morning 👋', style: theme.textTheme.bodyMedium),
           Text(
             'Chemistry AI',
             style: theme.textTheme.headlineSmall?.copyWith(
@@ -31,10 +28,7 @@ class HomeAppBar extends StatelessWidget {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: CircleAvatar(
-            radius: 20,
-            child: Icon(Icons.person),
-          ),
+          child: CircleAvatar(radius: 20, child: Icon(Icons.person)),
         ),
       ],
     );

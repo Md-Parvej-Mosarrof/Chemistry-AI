@@ -29,14 +29,13 @@ extension BuildContextExtension on BuildContext {
   EdgeInsets get viewInsets => MediaQuery.of(this).viewInsets;
 
   /// Show a snackbar
-  void showSnackBar(String message,
-      {Duration duration = const Duration(seconds: 2)}) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: duration,
-      ),
-    );
+  void showSnackBar(
+    String message, {
+    Duration duration = const Duration(seconds: 2),
+  }) {
+    ScaffoldMessenger.of(
+      this,
+    ).showSnackBar(SnackBar(content: Text(message), duration: duration));
   }
 }
 

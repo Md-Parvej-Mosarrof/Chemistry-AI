@@ -15,8 +15,7 @@ class FakeReactionDataSource {
           products: ['H₂O'],
           reactionType: 'Combination',
           conditions: 'Heat',
-          explanation:
-              'Hydrogen reacts with oxygen to produce water.',
+          explanation: 'Hydrogen reacts with oxygen to produce water.',
           isBalanced: true,
         );
 

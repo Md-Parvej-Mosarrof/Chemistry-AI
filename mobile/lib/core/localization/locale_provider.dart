@@ -7,8 +7,7 @@ final localeRepositoryProvider = Provider<LocaleRepository>((ref) {
   return LocaleRepository();
 });
 
-final localeProvider =
-    ChangeNotifierProvider<LocaleNotifier>((ref) {
+final localeProvider = ChangeNotifierProvider<LocaleNotifier>((ref) {
   final repository = ref.watch(localeRepositoryProvider);
 
   return LocaleNotifier(repository);

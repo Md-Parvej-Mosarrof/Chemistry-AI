@@ -8,43 +8,29 @@ class NetworkException implements Exception {
   factory NetworkException.fromDioException(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
-        return const NetworkException(
-          'Connection timeout. Please try again.',
-        );
+        return const NetworkException('Connection timeout. Please try again.');
 
       case DioExceptionType.sendTimeout:
-        return const NetworkException(
-          'Request timeout. Please try again.',
-        );
+        return const NetworkException('Request timeout. Please try again.');
 
       case DioExceptionType.receiveTimeout:
-        return const NetworkException(
-          'Server took too long to respond.',
-        );
+        return const NetworkException('Server took too long to respond.');
 
       case DioExceptionType.connectionError:
-        return const NetworkException(
-          'No internet connection.',
-        );
+        return const NetworkException('No internet connection.');
 
       case DioExceptionType.badCertificate:
-        return const NetworkException(
-          'Bad SSL certificate.',
-        );
+        return const NetworkException('Bad SSL certificate.');
 
       case DioExceptionType.cancel:
-        return const NetworkException(
-          'Request cancelled.',
-        );
+        return const NetworkException('Request cancelled.');
 
       case DioExceptionType.badResponse:
         return _handleStatusCode(error.response?.statusCode);
 
       case DioExceptionType.unknown:
       default:
-        return const NetworkException(
-          'Unexpected error occurred.',
-        );
+        return const NetworkException('Unexpected error occurred.');
     }
   }
 

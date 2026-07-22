@@ -19,9 +19,7 @@ class ChapterCard extends StatelessWidget {
     if (isHorizontal) {
       return Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(12),
@@ -44,8 +42,8 @@ class ChapterCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -56,9 +54,7 @@ class ChapterCard extends StatelessWidget {
     } else {
       return Card(
         elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(8),
@@ -68,7 +64,9 @@ class ChapterCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
                   child: Icon(
                     icon ?? Icons.book,
                     color: Theme.of(context).colorScheme.primary,
@@ -82,16 +80,15 @@ class ChapterCard extends StatelessWidget {
                       Text(
                         title,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       if (subtitle != null) ...[const SizedBox(height: 4)],
                       if (subtitle != null)
                         Text(
                           subtitle!,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                     ],
                   ),

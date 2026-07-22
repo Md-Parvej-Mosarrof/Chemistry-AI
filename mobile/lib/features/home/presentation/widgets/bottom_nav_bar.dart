@@ -11,7 +11,6 @@ class BottomNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
@@ -55,4 +54,3 @@ class BottomNavBar extends ConsumerWidget {
     );
   }
 }
-

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 
-
 class RoutePaths {
   static const String home = '/';
   static const String chapters = '/chapters';
@@ -25,9 +24,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'chapters',
         builder: (context, state) => Scaffold(
           appBar: AppBar(title: const Text('Chapters')),
-          body: const Center(
-            child: Text('Chapters Screen'),
-          ),
+          body: const Center(child: Text('Chapters Screen')),
         ),
       ),
       GoRoute(
@@ -35,9 +32,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'quiz',
         builder: (context, state) => Scaffold(
           appBar: AppBar(title: const Text('Quiz')),
-          body: const Center(
-            child: Text('Quiz Screen'),
-          ),
+          body: const Center(child: Text('Quiz Screen')),
         ),
       ),
       GoRoute(
@@ -45,19 +40,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'profile',
         builder: (context, state) => Scaffold(
           appBar: AppBar(title: const Text('Profile')),
-          body: const Center(
-            child: Text('Profile Screen'),
-          ),
+          body: const Center(child: Text('Profile Screen')),
         ),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Error'),
-      ),
-      body: const Center(
-        child: Text('Page not found'),
-      ),
+      appBar: AppBar(title: const Text('Error')),
+      body: const Center(child: Text('Page not found')),
     ),
   );
 });
