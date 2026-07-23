@@ -1,7 +1,7 @@
 /// Application-wide constants
 class AppConstants {
   /// Base API URL for backend connection
-  static const String baseUrl = 'http://localhost:8000/api/v1';
+  static const String baseUrl =  'https://6a621fb11bffb2ffab8af4b1.mockapi.io';
 
   /// Request timeout in seconds
   static const int requestTimeout = 30;
