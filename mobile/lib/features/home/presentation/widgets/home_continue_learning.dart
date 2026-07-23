@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/widgets/app_error_widget.dart';
+import '../../../../core/widgets/loading_skeleton.dart';
 
 import '../providers/home_notifier.dart';
 
@@ -13,29 +15,17 @@ class HomeContinueLearning extends ConsumerWidget {
     final theme = Theme.of(context);
 
     if (homeState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const  LoadingSkeleton();
     }
 
     if (homeState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Something went wrong", style: theme.textTheme.titleMedium),
-
-            const SizedBox(height: 12),
-
-            ElevatedButton(
-              onPressed: () {
-                ref.read(homeNotifierProvider.notifier).loadHomeData();
-              },
-              child: const Text("Retry"),
-            ),
-          ],
-        ),
+      return AppErrorWidget(
+        message: homeState.error!,
+        onRetry: () {
+          ref.read(homeNotifierProvider.notifier).retry();
+        },
       );
     }
-
     final items = homeState.data;
 
     if (items.isEmpty) {

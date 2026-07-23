@@ -12,20 +12,39 @@ class HomeNotifier extends StateNotifier<HomeState> {
   final HomeUseCase _useCase;
 
   Future<void> loadHomeData() async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(
+      isLoading: true,
+      error: null,
+    );
 
     try {
       final result = await _useCase();
 
-      state = state.copyWith(isLoading: false, data: result);
+      state = state.copyWith(
+        isLoading: false,
+        data: result,
+        error: null,
+      );
     } catch (error) {
-      state = state.copyWith(isLoading: false, error: error.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: error.toString().replaceFirst('Exception: ', ''),
+      );
     }
+  }
+
+  Future<void> refresh() async {
+    await loadHomeData();
+  }
+
+  Future<void> retry() async {
+    await loadHomeData();
   }
 }
 
-final homeNotifierProvider = StateNotifierProvider<HomeNotifier, HomeState>((
-  ref,
-) {
-  return HomeNotifier(ref.read(homeUseCaseProvider));
+final homeNotifierProvider =
+    StateNotifierProvider<HomeNotifier, HomeState>((ref) {
+  return HomeNotifier(
+    ref.read(homeUseCaseProvider),
+  );
 });

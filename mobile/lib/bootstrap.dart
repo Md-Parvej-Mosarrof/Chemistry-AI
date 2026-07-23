@@ -6,14 +6,19 @@ import 'l10n/app_localizations.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/localization/locale_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'core/storage/hive_service.dart';
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize any required services here
-  // e.g., HiveDB, SharedPreferences, Firebase, etc.
+  await HiveService.init();
 
-  runApp(const ProviderScope(child: ChemistryLearningApp()));
+  runApp(
+    const ProviderScope(
+      child: ChemistryLearningApp(),
+    ),
+  );
 }
 
 class ChemistryLearningApp extends ConsumerWidget {
